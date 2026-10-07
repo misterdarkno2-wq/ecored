@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#123e33" />
+    <meta
+      name="description"
+      content="EcoRed: monitoreo de estaciones meteorológicas, datos actuales e historial."
+    />
+    <title>EcoRed · Panel meteorológico</title>
+    <link rel="icon" href="/static/logo.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="/static/styles.css" />
+    <script src="/static/app.js" defer></script>
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="/" aria-label="EcoRed, inicio"
+        ><img src="/static/logo.svg" alt="" width="36" height="36" />Eco<span
+          >Red</span
+        ></a
+      ><span class="toplabel">RED DE MONITOREO AMBIENTAL</span
+      ><a class="api-link" href="/docs" target="_blank" rel="noopener"
+        >Documentación API ↗</a
+      >
+    </header>
+    <main>
+      <section class="heading">
+        <div>
+          <p class="eyebrow">OBSERVA. CONECTA. COMPRENDE.</p>
+          <h1>El clima, más cerca.</h1>
+          <p class="subtitle">
+            Datos de tu estación meteorológica, en un solo lugar.
+          </p>
+        </div>
+        <div class="connection">
+          <span class="dot" id="status-dot"></span
+          ><span id="connection-status" role="status">Conectando…</span>
+        </div>
+      </section>
+      <section class="toolbar" aria-label="Filtros">
+        <div class="station-field">
+          <label for="station">ESTACIÓN</label
+          ><select id="station">
+            <option value="">Cargando estaciones…</option></select
+          ><span id="location">—</span>
+        </div>
+        <div class="range-field">
+          <label for="range">PERÍODO DEL HISTORIAL</label
+          ><select id="range">
+            <option value="24">Últimas 24 horas</option>
+            <option value="168">Últimos 7 días</option>
+            <option value="720">Últimos 30 días</option>
+          </select>
+        </div>
+        <button id="refresh" class="button secondary">↻ Actualizar</button>
+      </section>
+      <div id="notice" class="notice" role="alert" hidden></div>
+      <section class="current-heading">
+        <h2>Condiciones actuales</h2>
+        <p id="updated">Esperando la primera medición</p>
+      </section>
+      <section class="metrics" aria-label="Última medición">
+        <article class="metric featured">
+          <div class="metric-label">
+            Temperatura <span aria-hidden="true">☀</span>
+          </div>
+          <p class="value"><span id="temperature">—</span><small>°C</small></p>
+          <p class="metric-note">Temperatura del aire</p>
+        </article>
+        <article class="metric">
+          <div class="metric-label">
+            Humedad <span aria-hidden="true">◈</span>
+          </div>
+          <p class="value"><span id="humidity">—</span><small>%</small></p>
+          <p class="metric-note">Humedad relativa</p>
+        </article>
+        <article class="metric">
+          <div class="metric-label">
+            Presión <span aria-hidden="true">◎</span>
+          </div>
+          <p class="value"><span id="pressure">—</span><small>hPa</small></p>
+          <p class="metric-note">Presión atmosférica</p>
+        </article>
+        <article class="metric">
+          <div class="metric-label">
+            Viento <span aria-hidden="true">≋</span>
+          </div>
+          <p class="value"><span id="wind_speed">—</span><small>km/h</small></p>
+          <p class="metric-note" id="wind-note">Dirección sin datos</p>
+        </article>
+        <article class="metric">
+          <div class="metric-label">
+            Precipitación <span aria-hidden="true">☂</span>
+          </div>
+          <p class="value"><span id="rainfall">—</span><small>mm</small></p>
+          <p class="metric-note">En el último intervalo</p>
+        </article>
+      </section>
+      <section class="analysis-grid">
+        <article class="panel chart-panel">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">EVOLUCIÓN DEL CLIMA</p>
+              <h2>Tendencia de mediciones</h2>
+            </div>
+            <label class="sr-only" for="metric">Variable del gráfico</label
+            ><select id="metric">
+              <option value="temperature">Temperatura · °C</option>
+              <option value="humidity">Humedad · %</option>
+              <option value="pressure">Presión · hPa</option>
+              <option value="wind_speed">Viento · km/h</option>
+              <option value="rainfall">Lluvia · mm</option>
+            </select>
+          </div>
+          <div
+            id="chart"
+            class="chart"
+            role="img"
+            aria-label="Sin lecturas para graficar"
+          >
+            <p class="empty">Las próximas lecturas aparecerán aquí.</p>
+          </div>
+          <p id="chart-note" class="chart-note">
+            Los datos se actualizan cada 30 segundos.
+          </p>
+        </article>
+        <article class="panel summary-panel">
+          <p class="eyebrow">EN EL PERÍODO SELECCIONADO</p>
+          <h2>Resumen del clima</h2>
+          <dl>
+            <div>
+              <dt>Temperatura mínima</dt>
+              <dd id="temp-min">—</dd>
+            </div>
+            <div>
+              <dt>Temperatura máxima</dt>
+              <dd id="temp-max">—</dd>
+            </div>
+            <div>
+              <dt>Temperatura media</dt>
+              <dd id="temp-avg">—</dd>
+            </div>
+            <div>
+              <dt>Humedad media</dt>
+              <dd id="humidity-avg">—</dd>
+            </div>
+            <div>
+              <dt>Viento máximo</dt>
+              <dd id="wind-max">—</dd>
+            </div>
+            <div>
+              <dt>Lluvia acumulada</dt>
+              <dd id="rain-total">—</dd>
+            </div>
+          </dl>
+          <div class="reading-count">
+            <span id="reading-count">0</span> mediciones registradas
+          </div>
+        </article>
+      </section>
+      <section class="panel history-panel">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">REGISTRO DE LA ESTACIÓN</p>
+            <h2>Historial de mediciones</h2>
+          </div>
+          <button id="export" class="button secondary">↓ Descargar CSV</button>
+        </div>
+        <div class="table-scroll">
+          <table>
+            <caption class="sr-only">
+              Historial. Las fechas se muestran en la zona horaria de tu
+              dispositivo.
+            </caption>
+            <thead>
+              <tr>
+                <th scope="col">Fecha y hora</th>
+                <th scope="col">Temperatura</th>
+                <th scope="col">Humedad</th>
+                <th scope="col">Presión</th>
+                <th scope="col">Viento</th>
+                <th scope="col">Dirección</th>
+                <th scope="col">Lluvia</th>
+              </tr>
+            </thead>
+            <tbody id="history">
+              <tr>
+                <td colspan="7" class="empty">Todavía no hay mediciones.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="pagination">
+          <p id="page-label">0 registros</p>
+          <div>
+            <button id="previous" class="button secondary" disabled>
+              ← Anterior</button
+            ><button id="next" class="button secondary" disabled>
+              Siguiente →
+            </button>
+          </div>
+        </div>
+      </section>
+      <section class="pipeline" aria-label="Flujo de datos">
+        <span>01 <strong>Sensores + ESP32</strong></span
+        ><b aria-hidden="true">→</b><span>02 <strong>Enlace LoRa</strong></span
+        ><b aria-hidden="true">→</b
+        ><span>03 <strong>Estación base</strong></span
+        ><b aria-hidden="true">→</b><span>04 <strong>EcoRed</strong></span>
+      </section>
+    </main>
+    <footer>
+      <span>EcoRed · Conectados con nuestro entorno.</span
+      ><span id="timezone">Horario del dispositivo</span>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,33 @@
+services:
+  db:
+    image: mysql:8.4
+    environment:
+      MYSQL_DATABASE: ${DB_NAME:-ecored}
+      MYSQL_USER: ${DB_USER:-ecored}
+      MYSQL_PASSWORD: ${DB_PASSWORD:?Configura DB_PASSWORD en .env}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?Configura MYSQL_ROOT_PASSWORD en .env}
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost --silent"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+    restart: unless-stopped
+  api:
+    build: .
+    environment:
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_NAME: ${DB_NAME:-ecored}
+      DB_USER: ${DB_USER:-ecored}
+      DB_PASSWORD: ${DB_PASSWORD:?Configura DB_PASSWORD en .env}
+      INGEST_API_KEY: ${INGEST_API_KEY:?Configura INGEST_API_KEY en .env}
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+volumes:
+  mysql_data:

@@ -1,0 +1,38 @@
+name: Tests
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  api-and-mysql:
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_DATABASE: ecored_test
+          MYSQL_USER: ecored
+          MYSQL_PASSWORD: testing-password
+          MYSQL_ROOT_PASSWORD: testing-root-password
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping --silent"
+          --health-interval=5s --health-timeout=5s --health-retries=30
+    env:
+      DB_HOST: 127.0.0.1
+      DB_PORT: 3306
+      DB_NAME: ecored_test
+      DB_USER: ecored
+      DB_PASSWORD: testing-password
+      INGEST_API_KEY: ci-only-key-0000000000000000000000000000
+      RUN_DB_TESTS: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+      - run: pip install -r requirements-dev.txt
+      - run: ruff check app scripts tests
+      - run: ruff format --check app scripts tests
+      - run: python -m pytest -q
