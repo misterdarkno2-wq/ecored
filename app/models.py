@@ -1,9 +1,11 @@
 from datetime import datetime, timezone
 from typing import Annotated
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
+from pydantic import AliasChoices, BaseModel, ConfigDict, Field, field_validator, model_validator
 
 StationId = Annotated[str, Field(min_length=1, max_length=64, pattern=r"^[A-Za-z0-9_-]+$")]
+SampleId = Annotated[str, Field(min_length=1, max_length=64, pattern=r"^[A-Za-z0-9_-]+$")]
+ADC = Annotated[int, Field(strict=True, ge=0, le=4095)]
 
 
 class StationCreate(BaseModel):
@@ -23,9 +25,28 @@ class StationCreate(BaseModel):
 class MeasurementCreate(BaseModel):
     model_config = ConfigDict(extra="forbid", allow_inf_nan=False)
     station_id: StationId
+    sample_id: SampleId | None = None
     measured_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
-    temperature: float | None = Field(default=None, ge=-80, le=70, description="°C")
-    humidity: float | None = Field(default=None, ge=0, le=100, description="%")
+    temperature: float | None = Field(
+        default=None,
+        ge=-80,
+        le=70,
+        description="°C",
+        validation_alias=AliasChoices("temperature", "temperatura"),
+    )
+    humidity: float | None = Field(
+        default=None, ge=0, le=100, description="%", validation_alias=AliasChoices("humidity", "humedad")
+    )
+    mq2: ADC | None = None
+    mq135: ADC | None = None
+    mq9: ADC | None = None
+    uv: ADC | None = None
+    rssi: float | None = Field(
+        default=None, ge=-200, le=50, description="dBm", validation_alias=AliasChoices("rssi", "ultimoRSSI")
+    )
+    snr: float | None = Field(
+        default=None, ge=-50, le=50, description="dB", validation_alias=AliasChoices("snr", "ultimoSNR")
+    )
     pressure: float | None = Field(default=None, ge=300, le=1200, description="hPa")
     wind_speed: float | None = Field(default=None, ge=0, le=400, description="km/h")
     wind_direction: float | None = Field(default=None, ge=0, lt=360, description="Grados")
@@ -48,7 +69,29 @@ class MeasurementCreate(BaseModel):
         return self
 
 
-SENSOR_FIELDS = ("temperature", "humidity", "pressure", "wind_speed", "wind_direction", "rainfall")
+SENSOR_FIELDS = (
+    "temperature",
+    "humidity",
+    "mq2",
+    "mq135",
+    "mq9",
+    "uv",
+    "pressure",
+    "wind_speed",
+    "wind_direction",
+    "rainfall",
+)
+MEASUREMENT_FIELDS = (*SENSOR_FIELDS, "rssi", "snr")
+
+
+class LoRaPacket(BaseModel):
+    model_config = ConfigDict(extra="forbid", allow_inf_nan=False)
+    station_id: StationId
+    sample_id: SampleId
+    packet: str = Field(min_length=1, max_length=180)
+    measured_at: datetime | None = None
+    rssi: float | None = Field(default=None, ge=-200, le=50)
+    snr: float | None = Field(default=None, ge=-50, le=50)
 
 
 class Measurement(MeasurementCreate):

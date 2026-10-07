@@ -28,7 +28,7 @@ def settings_override():
 
 def test_dashboard_and_health():
     assert client.get("/").status_code == 200
-    assert "El clima, más cerca." in client.get("/").text
+    assert "Tu entorno, más cerca." in client.get("/").text
     assert client.get("/static/app.js").status_code == 200
     assert client.get("/health").json() == {"status": "ok"}
     assert (

@@ -6,9 +6,9 @@
     <meta name="theme-color" content="#123e33" />
     <meta
       name="description"
-      content="EcoRed: monitoreo de estaciones meteorológicas, datos actuales e historial."
+      content="EcoRed: temperatura, humedad, sensores MQ y UV, enlace LoRa e historial."
     />
-    <title>EcoRed · Panel meteorológico</title>
+    <title>EcoRed · Panel ambiental</title>
     <link rel="icon" href="/static/logo.svg" type="image/svg+xml" />
     <link rel="stylesheet" href="/static/styles.css" />
     <script src="/static/app.js" defer></script>
@@ -28,9 +28,9 @@
       <section class="heading">
         <div>
           <p class="eyebrow">OBSERVA. CONECTA. COMPRENDE.</p>
-          <h1>El clima, más cerca.</h1>
+          <h1>Tu entorno, más cerca.</h1>
           <p class="subtitle">
-            Datos de tu estación meteorológica, en un solo lugar.
+            Datos del WROOM32 y tu enlace LoRa, en un solo lugar.
           </p>
         </div>
         <div class="connection">
@@ -48,7 +48,8 @@
         <div class="range-field">
           <label for="range">PERÍODO DEL HISTORIAL</label
           ><select id="range">
-            <option value="24">Últimas 24 horas</option>
+            <option value="1">Última hora</option>
+            <option value="24" selected>Últimas 24 horas</option>
             <option value="168">Últimos 7 días</option>
             <option value="720">Últimos 30 días</option>
           </select>
@@ -76,41 +77,53 @@
           <p class="metric-note">Humedad relativa</p>
         </article>
         <article class="metric">
-          <div class="metric-label">
-            Presión <span aria-hidden="true">◎</span>
-          </div>
-          <p class="value"><span id="pressure">—</span><small>hPa</small></p>
-          <p class="metric-note">Presión atmosférica</p>
+          <div class="metric-label">MQ2 <span aria-hidden="true">◎</span></div>
+          <p class="value"><span id="mq2">—</span><small>ADC</small></p>
+          <p class="metric-note">Lectura analógica del sensor</p>
         </article>
         <article class="metric">
           <div class="metric-label">
-            Viento <span aria-hidden="true">≋</span>
+            MQ135 <span aria-hidden="true">≋</span>
           </div>
-          <p class="value"><span id="wind_speed">—</span><small>km/h</small></p>
-          <p class="metric-note" id="wind-note">Dirección sin datos</p>
+          <p class="value"><span id="mq135">—</span><small>ADC</small></p>
+          <p class="metric-note">Lectura analógica del sensor</p>
         </article>
         <article class="metric">
-          <div class="metric-label">
-            Precipitación <span aria-hidden="true">☂</span>
-          </div>
-          <p class="value"><span id="rainfall">—</span><small>mm</small></p>
-          <p class="metric-note">En el último intervalo</p>
+          <div class="metric-label">MQ9 <span aria-hidden="true">◈</span></div>
+          <p class="value"><span id="mq9">—</span><small>ADC</small></p>
+          <p class="metric-note">Lectura analógica del sensor</p>
         </article>
+        <article class="metric">
+          <div class="metric-label">UV <span aria-hidden="true">☀</span></div>
+          <p class="value"><span id="uv">—</span><small>ADC</small></p>
+          <p class="metric-note">Lectura analógica del sensor</p>
+        </article>
+      </section>
+      <section class="panel link-panel" aria-label="Enlace LoRa">
+        <div>
+          <h2>Enlace LoRa</h2>
+          <p>WROOM32 → Heltec V4 → Heltec V3</p>
+        </div>
+        <div><span>RSSI</span><strong id="rssi">—</strong></div>
+        <div><span>SNR</span><strong id="snr">—</strong></div>
       </section>
       <section class="analysis-grid">
         <article class="panel chart-panel">
           <div class="panel-heading">
             <div>
-              <p class="eyebrow">EVOLUCIÓN DEL CLIMA</p>
+              <p class="eyebrow">EVOLUCIÓN DEL ENTORNO</p>
               <h2>Tendencia de mediciones</h2>
             </div>
             <label class="sr-only" for="metric">Variable del gráfico</label
             ><select id="metric">
               <option value="temperature">Temperatura · °C</option>
               <option value="humidity">Humedad · %</option>
-              <option value="pressure">Presión · hPa</option>
-              <option value="wind_speed">Viento · km/h</option>
-              <option value="rainfall">Lluvia · mm</option>
+              <option value="mq2">MQ2 · ADC</option>
+              <option value="mq135">MQ135 · ADC</option>
+              <option value="mq9">MQ9 · ADC</option>
+              <option value="uv">UV · ADC</option>
+              <option value="rssi">RSSI · dBm</option>
+              <option value="snr">SNR · dB</option>
             </select>
           </div>
           <div
@@ -127,7 +140,7 @@
         </article>
         <article class="panel summary-panel">
           <p class="eyebrow">EN EL PERÍODO SELECCIONADO</p>
-          <h2>Resumen del clima</h2>
+          <h2>Resumen ambiental</h2>
           <dl>
             <div>
               <dt>Temperatura mínima</dt>
@@ -146,12 +159,20 @@
               <dd id="humidity-avg">—</dd>
             </div>
             <div>
-              <dt>Viento máximo</dt>
-              <dd id="wind-max">—</dd>
+              <dt>MQ2 medio</dt>
+              <dd id="mq2-avg">—</dd>
             </div>
             <div>
-              <dt>Lluvia acumulada</dt>
-              <dd id="rain-total">—</dd>
+              <dt>MQ135 medio</dt>
+              <dd id="mq135-avg">—</dd>
+            </div>
+            <div>
+              <dt>MQ9 medio</dt>
+              <dd id="mq9-avg">—</dd>
+            </div>
+            <div>
+              <dt>UV máximo</dt>
+              <dd id="uv-max">—</dd>
             </div>
           </dl>
           <div class="reading-count">
@@ -178,15 +199,17 @@
                 <th scope="col">Fecha y hora</th>
                 <th scope="col">Temperatura</th>
                 <th scope="col">Humedad</th>
-                <th scope="col">Presión</th>
-                <th scope="col">Viento</th>
-                <th scope="col">Dirección</th>
-                <th scope="col">Lluvia</th>
+                <th scope="col">MQ2 · ADC</th>
+                <th scope="col">MQ135 · ADC</th>
+                <th scope="col">MQ9 · ADC</th>
+                <th scope="col">UV · ADC</th>
+                <th scope="col">RSSI</th>
+                <th scope="col">SNR</th>
               </tr>
             </thead>
             <tbody id="history">
               <tr>
-                <td colspan="7" class="empty">Todavía no hay mediciones.</td>
+                <td colspan="9" class="empty">Todavía no hay mediciones.</td>
               </tr>
             </tbody>
           </table>

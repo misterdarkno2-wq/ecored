@@ -1,20 +1,21 @@
-# EcoRed · Estación meteorológica
+# EcoRed · Monitoreo ambiental
 
 Servidor **FastAPI**, conexión directa a **MySQL con PyMySQL** y panel web en español. Implementa la parte servidor/base de datos/página del flujo:
 
 ```text
 Sensores → ESP32 → Heltec LoRa → Estación base → HTTP/JSON → FastAPI → MySQL
                                                                ↕
-                                                        Panel meteorológico
+                                                        Panel ambiental
 ```
 
-El firmware de ESP32/Heltec no forma parte de este proyecto. La estación base debe publicar el JSON indicado más abajo.
+Incluye el [receptor Heltec V3 adaptado](firmware/README.md) para el paquete del WROOM32 y puente V4 proporcionados: `T:…,H:…,MQ2:…,MQ135:…,MQ9:…,UV:…`. La conexión MySQL está en FastAPI; el V3 envía por HTTP.
 
 ## Qué incluye
 
 - Recepción de mediciones con `X-API-Key`, validación de sensores y fechas UTC.
 - Estaciones, última lectura, historial paginado, resumen y exportación CSV.
-- Panel adaptable a móvil: temperatura, humedad, presión, viento, lluvia, gráficos y actualización cada 30 segundos.
+- Panel adaptable a móvil: temperatura, humedad, MQ2, MQ135, MQ9, UV, RSSI y SNR, gráficos y actualización cada 30 segundos.
+- Receptor V3 con panel local, cola de envío, reintentos y prevención de duplicados por `sample_id`.
 - Estados explícitos para ausencia de lecturas, datos antiguos y fallos de conexión. No se generan datos ficticios automáticamente.
 - SQL parametrizado, transacciones, cierre de conexiones y respuestas sin credenciales.
 - Esquema SQL, Docker Compose y pruebas de API y de integración con MySQL 8.4 en GitHub Actions.
@@ -49,17 +50,17 @@ Configura `.env` con el host, puerto, nombre de base, usuario, contraseña y cla
 ```sql
 CREATE DATABASE ecored CHARACTER SET utf8mb4;
 CREATE USER 'ecored'@'localhost' IDENTIFIED BY 'tu-contraseña-de-base';
-GRANT SELECT, INSERT, CREATE, REFERENCES ON ecored.* TO 'ecored'@'localhost';
+GRANT SELECT, INSERT, CREATE, ALTER, INDEX, REFERENCES ON ecored.* TO 'ecored'@'localhost';
 ```
 
 El usuario anterior sirve para inicializar y ejecutar la aplicación local. En otro host, ajusta el origen permitido del usuario MySQL. Después:
 
 ```console
 python -m scripts.init_db
-python -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+python -m scripts.run_server
 ```
 
-`scripts.init_db` requiere que la base ya exista. Se puede ejecutar repetidamente; crea tablas que falten sin borrar datos. `sql/schema.sql` también puede importarse directamente en la base seleccionada.
+`scripts.init_db` requiere que la base ya exista. Se puede ejecutar repetidamente; crea tablas que falten y migra las versiones anteriores añadiendo los campos MQ/UV/RSSI/SNR y `sample_id`, sin borrar mediciones. `sql/schema.sql` sirve para instalaciones nuevas; para actualizar una base anterior utiliza el script. Uvicorn también puede iniciarse directamente con `python -m uvicorn app.main:app --host 0.0.0.0 --port 8000`. `--reload` habilita recarga en desarrollo.
 
 ## Enviar lecturas desde la estación base
 
@@ -80,18 +81,22 @@ JSON de ejemplo, con las unidades requeridas:
   "measured_at": "2026-10-07T12:00:00-03:00",
   "temperature": 23.4,
   "humidity": 65.2,
-  "pressure": 1013.2,
-  "wind_speed": 12.5,
-  "wind_direction": 180,
-  "rainfall": 0.2
+  "mq2": 1200,
+  "mq135": 850,
+  "mq9": 430,
+  "uv": 210,
+  "rssi": -97.5,
+  "snr": 7.2
 }
 ```
 
-`temperature`: °C, `humidity`: %, `pressure`: hPa, `wind_speed`: km/h, `wind_direction`: grados [0, 360), `rainfall`: **mm caídos durante ese intervalo**, no el contador acumulado del sensor. El resumen suma esos intervalos. Convierte primero las unidades que entregue tu sensor.
+`temperature`: °C, `humidity`: %. Se admiten también `temperatura` y `humedad` como nombres de entrada. `mq2`, `mq135`, `mq9` y `uv` son enteros ADC de 12 bits (0–4095), sin conversión a ppm o índice UV. `rssi`: dBm; `snr`: dB. El receptor también puede enviar el paquete original a `/api/measurements/lora`, como explica la [guía del V3](firmware/README.md).
+
+La API conserva los campos opcionales de la primera versión: `pressure` (hPa), `wind_speed` (km/h), `wind_direction` (grados) y `rainfall` (mm por intervalo). Se siguen exportando en CSV; el panel muestra los sensores del hardware proporcionado.
 
 Puedes omitir sensores no disponibles o enviarlos como `null`; debe existir al menos una lectura. `measured_at` acepta `Z` o un desplazamiento de zona horaria; al omitirlo se usa la hora UTC del servidor. Las fechas se guardan y devuelven en UTC; el panel las muestra en la zona horaria del dispositivo.
 
-La respuesta correcta es `201`. Los errores posibles incluyen `401` (clave), `404` (estación sin registrar), `409` (misma estación y fecha ya registrada), `422` (datos inválidos) y `503` (configuración o base no disponible). Si se reintenta una lectura, **conserva su fecha original**: la pareja estación/fecha evita duplicados; un `409` indica que ya existe y permite comprobarla consultando el historial. No reutilices la misma fecha para lecturas diferentes.
+La respuesta correcta es `201`. Los errores posibles incluyen `401` (clave), `404` (estación sin registrar), `409` (misma estación/fecha o estación/`sample_id` ya registrada), `422` (datos inválidos) y `503` (configuración o base no disponible). Para reintentos usa el mismo `sample_id` y conserva la fecha si la tienes. `/api/measurements/lora` exige `sample_id`; en el endpoint JSON general es opcional. Un `409` indica que ya existe. Cada lectura nueva necesita un ID nuevo.
 
 Ejemplo PowerShell para enviar una lectura con la fecha actual:
 
@@ -119,6 +124,7 @@ Para registrar otra estación, envía `POST /api/stations` con la misma cabecera
 | GET | `/api/stations` | Estaciones registradas |
 | POST | `/api/stations` | Registrar estación (clave requerida) |
 | POST | `/api/measurements` | Guardar lectura (clave requerida) |
+| POST | `/api/measurements/lora` | Guardar paquete del V3 (clave requerida) |
 | GET | `/api/measurements/latest?station_id=EST-001` | Última lectura por fecha de medición |
 | GET | `/api/measurements?station_id=EST-001` | Historial descendente |
 | GET | `/api/measurements/summary?station_id=EST-001` | Resumen del período |

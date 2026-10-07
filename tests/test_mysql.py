@@ -68,6 +68,27 @@ def test_real_mysql_roundtrip():
             assert csv_response.status_code == 200
             rows = list(csv.DictReader(io.StringIO(csv_response.text.lstrip("\ufeff"))))
             assert len(rows) == 3 and rows[0]["temperature"] == "24.0"
+            lora_payload = {
+                "station_id": station,
+                "sample_id": "boot-00001",
+                "packet": "T:-99.0,H:60.2,MQ2:1200,MQ135:850,MQ9:430,UV:210",
+                "rssi": -95.5,
+                "snr": 7.2,
+            }
+            receiver = client.post("/api/measurements/lora", json=lora_payload, headers=headers)
+            assert receiver.status_code == 201, receiver.text
+            assert receiver.json()["temperature"] is None and receiver.json()["mq2"] == 1200
+            # Sin timestamp del receptor, sample_id evita duplicar en un reintento.
+            assert (
+                client.post("/api/measurements/lora", json=lora_payload, headers=headers).status_code == 409
+            )
+            current = client.get("/api/measurements/latest", params={"station_id": station}).json()
+            assert current["sample_id"] == "boot-00001" and current["rssi"] == -95.5
+            all_rows = client.get("/api/measurements/export", params={"station_id": station})
+            exported = list(csv.DictReader(io.StringIO(all_rows.text.lstrip("\ufeff"))))
+            assert any(row["mq2"] == "1200" and row["sample_id"] == "boot-00001" for row in exported)
+            aggregates = client.get("/api/measurements/summary", params={"station_id": station}).json()
+            assert aggregates["mq135_avg"] == 850 and aggregates["uv_max"] == 210
             assert (
                 client.post(
                     "/api/measurements",

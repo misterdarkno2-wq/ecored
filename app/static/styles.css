@@ -193,7 +193,7 @@ a:focus-visible {
 }
 .metrics {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(6, 1fr);
   gap: 14px;
   margin-bottom: 24px;
 }
@@ -496,9 +496,6 @@ footer {
   .value {
     font-size: 31px;
   }
-  .metrics .metric:last-child {
-    grid-column: span 2;
-  }
   .analysis-grid {
     grid-template-columns: 1fr;
     gap: 16px;
@@ -547,5 +544,48 @@ footer {
 @media (prefers-reduced-motion: no-preference) {
   .button {
     transition: background 0.15s;
+  }
+}
+.link-panel {
+  display: flex;
+  align-items: center;
+  gap: 36px;
+  margin-bottom: 24px;
+  padding: 18px 24px;
+}
+.link-panel > div:first-child {
+  flex: 1;
+}
+.link-panel h2 {
+  font-size: 15px;
+}
+.link-panel p {
+  margin: 7px 0 0;
+  color: var(--muted);
+  font-size: 11px;
+}
+.link-panel span {
+  color: var(--muted);
+  display: block;
+  font-size: 10px;
+  margin-bottom: 7px;
+}
+.link-panel strong {
+  font-size: 16px;
+  font-weight: 600;
+}
+@media (max-width: 1100px) and (min-width: 701px) {
+  .metrics {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+@media (max-width: 700px) {
+  .link-panel {
+    flex-wrap: wrap;
+    gap: 18px 35px;
+    padding: 18px;
+  }
+  .link-panel > div:first-child {
+    flex-basis: 100%;
   }
 }

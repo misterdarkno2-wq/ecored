@@ -11,12 +11,15 @@ from fastapi import Depends, FastAPI, HTTPException, Query, Security
 from fastapi.responses import FileResponse, JSONResponse, Response
 from fastapi.security import APIKeyHeader
 from fastapi.staticfiles import StaticFiles
+from pydantic import ValidationError
 
 from app import repository
 from app.config import get_settings
 from app.database import connection
+from app.lora import parse_packet
 from app.models import (
-    SENSOR_FIELDS,
+    MEASUREMENT_FIELDS,
+    LoRaPacket,
     Measurement,
     MeasurementCreate,
     MeasurementPage,
@@ -26,8 +29,8 @@ from app.models import (
 
 logger = logging.getLogger(__name__)
 app = FastAPI(
-    title="EcoRed · API meteorológica",
-    version="1.0.0",
+    title="EcoRed · API ambiental",
+    version="1.1.0",
     description="Recepción de lecturas LoRa, consulta de datos actuales e historial. Fechas en UTC.",
 )
 STATIC = Path(__file__).parent / "static"
@@ -71,7 +74,7 @@ def health():
 def database_health():
     with connection() as conn, conn.cursor() as cursor:
         cursor.execute("SELECT 1 FROM stations LIMIT 1")
-        cursor.execute("SELECT 1 FROM measurements LIMIT 1")
+        cursor.execute("SELECT sample_id, mq2, mq135, mq9, uv, rssi, snr FROM measurements LIMIT 1")
     return {"status": "ok", "database": "mysql"}
 
 
@@ -100,6 +103,25 @@ def register_station(station: StationCreate):
 )
 def ingest(data: MeasurementCreate):
     return repository.create_measurement(data)
+
+
+@app.post(
+    "/api/measurements/lora",
+    tags=["Mediciones"],
+    status_code=201,
+    response_model=Measurement,
+    dependencies=[Depends(require_key)],
+)
+def ingest_lora(data: LoRaPacket):
+    try:
+        measurement = parse_packet(data)
+    except ValidationError:
+        raise HTTPException(
+            422, "Las lecturas LoRa están fuera de rango o la fecha no tiene zona horaria"
+        ) from None
+    except ValueError as exc:
+        raise HTTPException(422, str(exc)) from None
+    return repository.create_measurement(measurement)
 
 
 @app.get("/api/measurements/latest", tags=["Mediciones"], response_model=Measurement)
@@ -144,7 +166,7 @@ def export(station_id: Annotated[StationId, Query()], dates: DateRange):
         raise HTTPException(422, "Exportación limitada a 10000 filas; reduce el rango de fechas")
     output = io.StringIO(newline="")
     writer = csv.writer(output)
-    fields = ("id", "station_id", "measured_at", *SENSOR_FIELDS, "received_at")
+    fields = ("id", "station_id", "sample_id", "measured_at", *MEASUREMENT_FIELDS, "received_at")
     writer.writerow(fields)
     for row in page["items"]:
         writer.writerow(

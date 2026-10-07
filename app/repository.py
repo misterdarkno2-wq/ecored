@@ -1,7 +1,7 @@
 from datetime import datetime, timezone
 
 from app.database import connection
-from app.models import SENSOR_FIELDS, MeasurementCreate, StationCreate
+from app.models import MEASUREMENT_FIELDS, MeasurementCreate, StationCreate
 
 
 def serialize_row(row: dict | None) -> dict | None:
@@ -29,13 +29,14 @@ def create_station(station: StationCreate):
 
 def create_measurement(data: MeasurementCreate):
     with connection() as conn, conn.cursor() as cursor:
+        fields = ("station_id", "sample_id", "measured_at", *MEASUREMENT_FIELDS)
         cursor.execute(
-            "INSERT INTO measurements (station_id, measured_at, temperature, humidity, "
-            "pressure, wind_speed, wind_direction, rainfall) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)",
+            f"INSERT INTO measurements ({', '.join(fields)}) VALUES ({', '.join(['%s'] * len(fields))})",
             (
                 data.station_id,
+                data.sample_id,
                 data.measured_at.replace(tzinfo=None),
-                *(getattr(data, field) for field in SENSOR_FIELDS),
+                *(getattr(data, field) for field in MEASUREMENT_FIELDS),
             ),
         )
         cursor.execute("SELECT * FROM measurements WHERE id = %s", (cursor.lastrowid,))
@@ -83,6 +84,7 @@ def summary(station_id: str, start: datetime | None, end: datetime | None):
         cursor.execute(
             "SELECT COUNT(*) AS count, MIN(temperature) AS temperature_min, "
             "MAX(temperature) AS temperature_max, AVG(temperature) AS temperature_avg, "
+            "AVG(mq2) AS mq2_avg, AVG(mq135) AS mq135_avg, AVG(mq9) AS mq9_avg, MAX(uv) AS uv_max, "
             "AVG(humidity) AS humidity_avg, MAX(wind_speed) AS wind_max, SUM(rainfall) AS rainfall_total "
             f"FROM measurements WHERE {where}",
             values,

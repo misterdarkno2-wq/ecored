@@ -8,3 +8,5 @@ __pycache__/
 .ruff_cache/
 *.log
 node_modules/
+firmware/receptor_v3/config.h
+firmware/receptor_v3/ecored_ca.h

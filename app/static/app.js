@@ -3,10 +3,12 @@ const $ = (id) => document.getElementById(id);
 const units = {
   temperature: "°C",
   humidity: "%",
-  pressure: "hPa",
-  wind_speed: "km/h",
-  rainfall: "mm",
-  wind_direction: "°",
+  mq2: "ADC",
+  mq135: "ADC",
+  mq9: "ADC",
+  uv: "ADC",
+  rssi: "dBm",
+  snr: "dB",
 };
 const number = new Intl.NumberFormat("es", { maximumFractionDigits: 1 });
 const date = new Intl.DateTimeFormat("es", {
@@ -76,11 +78,11 @@ function controls(disabled) {
 
 function renderLatest(row) {
   for (const field of Object.keys(units))
-    if ($(field)) $(field).textContent = fmt(row?.[field]);
-  $("wind-note").textContent =
-    row?.wind_direction == null
-      ? "Dirección sin datos"
-      : "Dirección: " + fmt(row.wind_direction, "°");
+    if ($(field))
+      $(field).textContent = fmt(
+        row?.[field],
+        ["rssi", "snr"].includes(field) ? units[field] : "",
+      );
   $("updated").textContent = row
     ? "Última lectura: " + date.format(new Date(row.measured_at))
     : "Esperando la primera medición";
@@ -91,8 +93,10 @@ function renderSummary(summary) {
     ["temp-max", "temperature_max", "°C"],
     ["temp-avg", "temperature_avg", "°C"],
     ["humidity-avg", "humidity_avg", "%"],
-    ["wind-max", "wind_max", "km/h"],
-    ["rain-total", "rainfall_total", "mm"],
+    ["mq2-avg", "mq2_avg", "ADC"],
+    ["mq135-avg", "mq135_avg", "ADC"],
+    ["mq9-avg", "mq9_avg", "ADC"],
+    ["uv-max", "uv_max", "ADC"],
   ])
     $(id).textContent = fmt(summary?.[field], unit);
   $("reading-count").textContent = number.format(summary?.count || 0);
@@ -103,7 +107,7 @@ function renderHistory(page) {
   body.replaceChildren();
   if (!page.items.length) {
     const cell = document.createElement("td");
-    cell.colSpan = 7;
+    cell.colSpan = 9;
     cell.className = "empty";
     cell.textContent = "No hay mediciones en este período.";
     const row = document.createElement("tr");
@@ -116,8 +120,6 @@ function renderHistory(page) {
       date.format(new Date(reading.measured_at)),
       ...Object.keys(units).map((field) => fmt(reading[field], units[field])),
     ];
-    // El orden de la tabla coloca dirección antes de lluvia.
-    [values[5], values[6]] = [values[6], values[5]];
     for (const value of values) {
       const cell = document.createElement("td");
       cell.textContent = value;
