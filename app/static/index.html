@@ -7,9 +7,9 @@
     <meta name="color-scheme" content="light dark" />
     <meta
       name="description"
-      content="Eco-Red: temperatura, humedad, gas y humo, calidad del aire, monóxido de carbono, radiación UV, enlace LoRa e historial."
+      content="Eco-Red: vea de forma sencilla cómo está el ambiente de su hogar: temperatura, humedad, gas y humo, calidad del aire, monóxido de carbono y radiación UV."
     />
-    <title>Eco-Red · Panel ambiental</title>
+    <title>Eco-Red · ¿Cómo está el ambiente?</title>
     <link rel="icon" href="/static/logo.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="/static/logo-180.png" />
     <link
@@ -20,6 +20,13 @@
       crossorigin
     />
     <link rel="stylesheet" href="/static/styles.css" />
+    <script>
+      // Aplicar la letra grande antes de dibujar la página, sin parpadeo.
+      try {
+        if (localStorage.getItem("ecored-letra") === "grande")
+          document.documentElement.classList.add("large-text");
+      } catch (e) {}
+    </script>
     <script src="/static/app.js" defer></script>
   </head>
   <body>
@@ -50,9 +57,27 @@
           d="M12 1.5v2m0 17v2m10.5-10.5h-2m-17 0h-2m17.4-7.4-1.4 1.4M6 18l-1.4 1.4m14.8 0L18 18M6 6 4.6 4.6"
         />
       </symbol>
-      <symbol id="i-signal" viewBox="0 0 24 24">
-        <path d="M3 20h.01M8 20v-4M13 20v-8M18 20V7" />
-        <path d="M18 3.5v.01" />
+      <symbol id="i-good" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="10" />
+        <path d="m7.5 12.5 3 3 6-6.5" />
+      </symbol>
+      <symbol id="i-warn" viewBox="0 0 24 24">
+        <path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z" />
+        <path d="M12 9v4.5M12 17.2v.01" />
+      </symbol>
+      <symbol id="i-danger" viewBox="0 0 24 24">
+        <path d="M7.9 2h8.2L22 7.9v8.2L16.1 22H7.9L2 16.1V7.9Z" />
+        <path d="M12 7.5v5.5M12 16.5v.01" />
+      </symbol>
+      <symbol id="i-wait" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="10" />
+        <path d="M12 6.5V12l3.5 2" />
+      </symbol>
+      <symbol id="i-off" viewBox="0 0 24 24">
+        <path d="m2 2 20 20" />
+        <path
+          d="M8.5 16.5a5 5 0 0 1 7 0M5 13a10 10 0 0 1 5.2-2.8M19 13a10 10 0 0 0-2-1.4M2 8.8a15 15 0 0 1 4.2-2.6M22 8.8A15 15 0 0 0 10.7 5M12 20h.01"
+        />
       </symbol>
       <symbol id="i-refresh" viewBox="0 0 24 24">
         <path d="M21 12a9 9 0 1 1-2.6-6.4L21 8" />
@@ -61,13 +86,20 @@
       <symbol id="i-download" viewBox="0 0 24 24">
         <path d="M12 3v12m0 0-4.5-4.5M12 15l4.5-4.5M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" />
       </symbol>
-      <symbol id="i-external" viewBox="0 0 24 24">
-        <path d="M14 4h6v6m0-6-9 9" />
-        <path d="M18 14v4a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4" />
+      <symbol id="i-text" viewBox="0 0 24 24">
+        <path d="M3 19 8 5l5 14M4.8 14h6.4M15 19l3.5-9 3.5 9M16 16.5h5" />
       </symbol>
-      <symbol id="i-pin" viewBox="0 0 24 24">
-        <path d="M12 21s7-6.2 7-11.5a7 7 0 0 0-14 0C5 14.8 12 21 12 21Z" />
-        <circle cx="12" cy="9.5" r="2.5" />
+      <symbol id="i-table" viewBox="0 0 24 24">
+        <rect x="3" y="4" width="18" height="16" rx="2" />
+        <path d="M3 9.5h18M3 15h18M9 4v16" />
+      </symbol>
+      <symbol id="i-tool" viewBox="0 0 24 24">
+        <path
+          d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.8-3.8a6 6 0 0 1-7.9 7.9l-6.9 6.9a2.1 2.1 0 0 1-3-3l6.9-6.9a6 6 0 0 1 7.9-7.9l-3.8 3.8Z"
+        />
+      </symbol>
+      <symbol id="i-chevron" viewBox="0 0 24 24">
+        <path d="m9 6 6 6-6 6" />
       </symbol>
     </svg>
 
@@ -76,290 +108,314 @@
         ><img src="/static/logo.svg" alt="" width="46" height="40" /><span
           >Eco-Red</span
         ></a
-      ><span class="toplabel">Red de monitoreo ambiental</span
-      ><a class="api-link" href="/docs" target="_blank" rel="noopener"
-        >Documentación API
-        <svg class="icon" aria-hidden="true"><use href="#i-external" /></svg
-      ></a>
+      >
+      <button id="text-size" class="text-size" aria-pressed="false">
+        <svg class="icon" aria-hidden="true"><use href="#i-text" /></svg
+        ><span id="text-size-label">Agrandar letra</span>
+      </button>
     </header>
 
     <main>
-      <section class="hero">
-        <div class="hero-copy">
-          <p class="eyebrow">Observa · Conecta · Comprende</p>
-          <h1>Tu entorno, más cerca.</h1>
-          <p class="subtitle">
-            Datos del WROOM32 y tu enlace LoRa, en un solo lugar.
+      <section class="greeting" aria-labelledby="greeting">
+        <div>
+          <h1 id="greeting">Hola</h1>
+          <p class="station-line">
+            <span id="station-name">Buscando su estación…</span
+            ><span id="location"></span>
           </p>
-          <div class="connection">
-            <span class="dot" id="status-dot"></span
-            ><span id="connection-status" role="status">Conectando…</span>
+          <div class="station-picker" id="station-picker" hidden>
+            <label for="station">Elegir estación</label
+            ><select id="station">
+              <option value="">Cargando estaciones…</option>
+            </select>
           </div>
         </div>
-        <div class="hero-art" aria-hidden="true">
-          <img src="/static/logo.svg" alt="" width="200" height="173" />
+        <div class="refresh-box">
+          <p id="updated">Esperando datos…</p>
+          <button id="refresh" class="button primary">
+            <svg class="icon" aria-hidden="true"><use href="#i-refresh" /></svg
+            >Actualizar ahora
+          </button>
         </div>
       </section>
 
-      <section class="toolbar" aria-label="Filtros">
-        <div class="station-field">
-          <label for="station">Estación</label
-          ><select id="station">
-            <option value="">Cargando estaciones…</option></select
-          ><span class="location"
-            ><svg class="icon" aria-hidden="true"><use href="#i-pin" /></svg
-            ><span id="location">—</span></span
-          >
+      <section
+        id="overall"
+        class="overall"
+        data-level="wait"
+        aria-live="polite"
+        aria-labelledby="overall-title"
+      >
+        <svg class="overall-icon" aria-hidden="true">
+          <use id="overall-icon" href="#i-wait" />
+        </svg>
+        <div>
+          <h2 id="overall-title">Buscando datos…</h2>
+          <p id="overall-text">
+            En unos segundos verá cómo está el ambiente de su hogar.
+          </p>
+          <ul id="overall-list"></ul>
         </div>
-        <div class="range-field">
-          <label for="range">Período del historial</label
-          ><select id="range">
-            <option value="1">Última hora</option>
-            <option value="24" selected>Últimas 24 horas</option>
-            <option value="168">Últimos 7 días</option>
-            <option value="720">Últimos 30 días</option>
-          </select>
-        </div>
-        <button id="refresh" class="button primary">
-          <svg class="icon" aria-hidden="true"><use href="#i-refresh" /></svg
-          >Actualizar
-        </button>
       </section>
 
       <div id="notice" class="notice" role="alert" hidden></div>
 
-      <section class="current-heading">
-        <h2>Condiciones actuales</h2>
-        <p id="updated">Esperando la primera medición</p>
+      <section class="legend" aria-label="Cómo leer los colores">
+        <span class="legend-title">Cómo leer los colores:</span>
+        <span class="pill" data-level="good"
+          ><svg class="icon" aria-hidden="true"><use href="#i-good" /></svg
+          >Verde: todo bien</span
+        ><span class="pill" data-level="warn"
+          ><svg class="icon" aria-hidden="true"><use href="#i-warn" /></svg
+          >Amarillo: ponga atención</span
+        ><span class="pill" data-level="danger"
+          ><svg class="icon" aria-hidden="true"><use href="#i-danger" /></svg
+          >Rojo: peligro</span
+        >
       </section>
 
-      <section class="metrics" aria-label="Última medición">
-        <article class="metric featured" data-metric="temperature">
-          <div class="metric-label">
-            Temperatura
+      <h2 class="section-title">Así está su hogar ahora</h2>
+      <section id="metrics" class="metrics" aria-label="Última medición">
+        <article class="metric" data-metric="temperature" data-level="none">
+          <h3>
             <span class="chip"
-              ><svg class="icon" aria-hidden="true">
-                <use href="#i-temp" /></svg
-            ></span>
-          </div>
-          <p class="value"><span id="temperature">—</span><small>°C</small></p>
-          <p class="metric-note">Temperatura del aire</p>
+              ><svg class="icon" aria-hidden="true"><use href="#i-temp" /></svg></span
+            >Temperatura
+          </h3>
+          <p class="value"><span id="temperature">—</span></p>
+          <p class="pill status" id="temperature-status">Sin datos</p>
+          <p class="advice" id="temperature-advice"></p>
         </article>
-        <article class="metric" data-metric="humidity">
-          <div class="metric-label">
-            Humedad
+        <article class="metric" data-metric="humidity" data-level="none">
+          <h3>
             <span class="chip"
-              ><svg class="icon" aria-hidden="true">
-                <use href="#i-drop" /></svg
-            ></span>
-          </div>
-          <p class="value"><span id="humidity">—</span><small>%</small></p>
-          <p class="metric-note">Humedad relativa</p>
+              ><svg class="icon" aria-hidden="true"><use href="#i-drop" /></svg></span
+            >Humedad
+          </h3>
+          <p class="value"><span id="humidity">—</span></p>
+          <p class="pill status" id="humidity-status">Sin datos</p>
+          <p class="advice" id="humidity-advice"></p>
         </article>
-        <article class="metric" data-metric="mq2">
-          <div class="metric-label">
-            Gas y humo
+        <article class="metric" data-metric="mq2" data-level="none">
+          <h3>
             <span class="chip"
-              ><svg class="icon" aria-hidden="true">
-                <use href="#i-flame" /></svg
-            ></span>
-          </div>
-          <p class="value"><span id="mq2">—</span><small>ADC</small></p>
-          <p class="metric-note">Gases inflamables</p>
+              ><svg class="icon" aria-hidden="true"><use href="#i-flame" /></svg></span
+            >Gas y humo
+          </h3>
+          <div class="meter" id="mq2" aria-hidden="true"><span></span></div>
+          <p class="pill status" id="mq2-status">Sin datos</p>
+          <p class="advice" id="mq2-advice"></p>
         </article>
-        <article class="metric" data-metric="mq135">
-          <div class="metric-label">
-            Calidad del aire
+        <article class="metric" data-metric="mq135" data-level="none">
+          <h3>
             <span class="chip"
-              ><svg class="icon" aria-hidden="true">
-                <use href="#i-wind" /></svg
-            ></span>
-          </div>
-          <p class="value"><span id="mq135">—</span><small>ADC</small></p>
-          <p class="metric-note">Contaminantes en el aire</p>
+              ><svg class="icon" aria-hidden="true"><use href="#i-wind" /></svg></span
+            >Calidad del aire
+          </h3>
+          <div class="meter" id="mq135" aria-hidden="true"><span></span></div>
+          <p class="pill status" id="mq135-status">Sin datos</p>
+          <p class="advice" id="mq135-advice"></p>
         </article>
-        <article class="metric" data-metric="mq9">
-          <div class="metric-label">
-            Monóxido (CO)
+        <article class="metric" data-metric="mq9" data-level="none">
+          <h3>
             <span class="chip"
-              ><svg class="icon" aria-hidden="true">
-                <use href="#i-cloud" /></svg
-            ></span>
-          </div>
-          <p class="value"><span id="mq9">—</span><small>ADC</small></p>
-          <p class="metric-note">Monóxido de carbono</p>
+              ><svg class="icon" aria-hidden="true"><use href="#i-cloud" /></svg></span
+            >Monóxido de carbono
+          </h3>
+          <div class="meter" id="mq9" aria-hidden="true"><span></span></div>
+          <p class="pill status" id="mq9-status">Sin datos</p>
+          <p class="advice" id="mq9-advice"></p>
         </article>
-        <article class="metric" data-metric="uv">
-          <div class="metric-label">
-            Radiación UV
+        <article class="metric" data-metric="uv" data-level="none">
+          <h3>
             <span class="chip"
-              ><svg class="icon" aria-hidden="true">
-                <use href="#i-sun" /></svg
-            ></span>
-          </div>
-          <p class="value"><span id="uv">—</span><small>ADC</small></p>
-          <p class="metric-note">Intensidad del sol</p>
-        </article>
-      </section>
-
-      <section class="panel link-panel" aria-label="Enlace LoRa">
-        <span class="chip link-chip"
-          ><svg class="icon" aria-hidden="true"><use href="#i-signal" /></svg
-        ></span>
-        <div class="link-title">
-          <h2>Enlace LoRa</h2>
-          <p>WROOM32 → Heltec V4 → Heltec V3</p>
-        </div>
-        <div class="link-stat">
-          <span>RSSI</span><strong id="rssi">—</strong>
-        </div>
-        <div class="link-stat">
-          <span>SNR</span><strong id="snr">—</strong>
-        </div>
-      </section>
-
-      <section class="analysis-grid">
-        <article class="panel chart-panel">
-          <div class="panel-heading">
-            <div>
-              <p class="eyebrow">Evolución del entorno</p>
-              <h2>Tendencia de mediciones</h2>
-            </div>
-            <label class="sr-only" for="metric">Variable del gráfico</label
-            ><select id="metric">
-              <option value="temperature">Temperatura · °C</option>
-              <option value="humidity">Humedad · %</option>
-              <option value="mq2">Gas y humo</option>
-              <option value="mq135">Calidad del aire</option>
-              <option value="mq9">Monóxido de carbono</option>
-              <option value="uv">Radiación UV</option>
-              <option value="rssi">Intensidad de señal LoRa · dBm</option>
-              <option value="snr">Calidad de señal LoRa · dB</option>
-            </select>
-          </div>
-          <div
-            id="chart"
-            class="chart"
-            data-metric="temperature"
-            role="img"
-            aria-label="Sin lecturas para graficar"
-          >
-            <p class="empty">Las próximas lecturas aparecerán aquí.</p>
-          </div>
-          <p id="chart-note" class="chart-note">
-            Los datos se actualizan cada 30 segundos.
-          </p>
-        </article>
-
-        <article class="panel summary-panel">
-          <p class="eyebrow">En el período seleccionado</p>
-          <h2>Resumen ambiental</h2>
-          <dl>
-            <div data-metric="temperature">
-              <dt>Temperatura mínima</dt>
-              <dd id="temp-min">—</dd>
-            </div>
-            <div data-metric="temperature">
-              <dt>Temperatura máxima</dt>
-              <dd id="temp-max">—</dd>
-            </div>
-            <div data-metric="temperature">
-              <dt>Temperatura media</dt>
-              <dd id="temp-avg">—</dd>
-            </div>
-            <div data-metric="humidity">
-              <dt>Humedad media</dt>
-              <dd id="humidity-avg">—</dd>
-            </div>
-            <div data-metric="mq2">
-              <dt>Gas y humo (media)</dt>
-              <dd id="mq2-avg">—</dd>
-            </div>
-            <div data-metric="mq135">
-              <dt>Calidad del aire (media)</dt>
-              <dd id="mq135-avg">—</dd>
-            </div>
-            <div data-metric="mq9">
-              <dt>Monóxido de carbono (media)</dt>
-              <dd id="mq9-avg">—</dd>
-            </div>
-            <div data-metric="uv">
-              <dt>Radiación UV máxima</dt>
-              <dd id="uv-max">—</dd>
-            </div>
-          </dl>
-          <div class="reading-count">
-            <span id="reading-count">0</span> mediciones registradas
-          </div>
+              ><svg class="icon" aria-hidden="true"><use href="#i-sun" /></svg></span
+            >Radiación del sol (UV)
+          </h3>
+          <div class="meter" id="uv" aria-hidden="true"><span></span></div>
+          <p class="pill status" id="uv-status">Sin datos</p>
+          <p class="advice" id="uv-advice"></p>
         </article>
       </section>
 
-      <section class="panel history-panel">
-        <div class="panel-heading">
-          <div>
-            <p class="eyebrow">Registro de la estación</p>
-            <h2>Historial de mediciones</h2>
+      <section class="panel trend" aria-labelledby="trend-title">
+        <h2 id="trend-title">¿Cómo ha cambiado?</h2>
+        <div class="choice-group">
+          <p class="choice-label" id="metric-label">Elija qué quiere ver:</p>
+          <div class="choices" id="metric-choices" role="group" aria-labelledby="metric-label">
+            <button data-value="temperature" aria-pressed="true">Temperatura</button>
+            <button data-value="humidity" aria-pressed="false">Humedad</button>
+            <button data-value="mq2" aria-pressed="false">Gas y humo</button>
+            <button data-value="mq135" aria-pressed="false">Calidad del aire</button>
+            <button data-value="mq9" aria-pressed="false">Monóxido</button>
+            <button data-value="uv" aria-pressed="false">Sol (UV)</button>
           </div>
-          <button id="export" class="button secondary">
-            <svg class="icon" aria-hidden="true"><use href="#i-download" /></svg
-            >Descargar CSV
-          </button>
         </div>
-        <div class="table-scroll">
-          <table>
-            <caption class="sr-only">
-              Historial. Las fechas se muestran en la zona horaria de tu
-              dispositivo.
-            </caption>
-            <thead>
-              <tr>
-                <th scope="col">Fecha y hora</th>
-                <th scope="col">Temperatura</th>
-                <th scope="col">Humedad</th>
-                <th scope="col">Gas y humo</th>
-                <th scope="col">Calidad del aire</th>
-                <th scope="col">Monóxido (CO)</th>
-                <th scope="col">Radiación UV</th>
-                <th scope="col">Señal (RSSI)</th>
-                <th scope="col">Calidad señal (SNR)</th>
-              </tr>
-            </thead>
-            <tbody id="history">
-              <tr>
-                <td colspan="9" class="empty">Todavía no hay mediciones.</td>
-              </tr>
-            </tbody>
-          </table>
+        <div class="choice-group">
+          <p class="choice-label" id="range-label">Período:</p>
+          <div class="choices" id="range-choices" role="group" aria-labelledby="range-label">
+            <button data-value="1" aria-pressed="false">Última hora</button>
+            <button data-value="24" aria-pressed="true">Último día</button>
+            <button data-value="168" aria-pressed="false">Última semana</button>
+            <button data-value="720" aria-pressed="false">Último mes</button>
+          </div>
         </div>
-        <div class="pagination">
-          <p id="page-label">0 registros</p>
-          <div>
+        <p id="chart-summary" class="chart-summary"></p>
+        <div
+          id="chart"
+          class="chart"
+          data-metric="temperature"
+          role="img"
+          aria-label="Sin lecturas para graficar"
+        >
+          <p class="empty">Las próximas mediciones aparecerán aquí.</p>
+        </div>
+        <p class="chart-legend">
+          <span class="band-sample" aria-hidden="true"></span>Franja verde: zona
+          normal
+        </p>
+      </section>
+
+      <section class="panel summary-panel" aria-labelledby="summary-title">
+        <h2 id="summary-title">Resumen del período</h2>
+        <dl>
+          <div data-metric="temperature">
+            <dt>Temperatura más baja</dt>
+            <dd id="temp-min">—</dd>
+          </div>
+          <div data-metric="temperature">
+            <dt>Temperatura más alta</dt>
+            <dd id="temp-max">—</dd>
+          </div>
+          <div data-metric="temperature">
+            <dt>Temperatura promedio</dt>
+            <dd id="temp-avg">—</dd>
+          </div>
+          <div data-metric="humidity">
+            <dt>Humedad promedio</dt>
+            <dd id="humidity-avg">—</dd>
+          </div>
+          <div data-metric="mq2">
+            <dt>Gas y humo (promedio)</dt>
+            <dd id="mq2-avg">—</dd>
+          </div>
+          <div data-metric="mq135">
+            <dt>Calidad del aire (promedio)</dt>
+            <dd id="mq135-avg">—</dd>
+          </div>
+          <div data-metric="mq9">
+            <dt>Monóxido de carbono (promedio)</dt>
+            <dd id="mq9-avg">—</dd>
+          </div>
+          <div data-metric="uv">
+            <dt>Radiación del sol (lo más alto)</dt>
+            <dd id="uv-max">—</dd>
+          </div>
+        </dl>
+        <p class="reading-count">
+          Se tomaron <strong id="reading-count">0</strong> mediciones en este
+          período.
+        </p>
+      </section>
+
+      <details class="panel more">
+        <summary>
+          <svg class="icon" aria-hidden="true"><use href="#i-table" /></svg
+          >Ver todas las mediciones
+          <svg class="icon chevron" aria-hidden="true"><use href="#i-chevron" /></svg>
+        </summary>
+        <div class="more-body">
+          <div class="table-scroll" tabindex="0">
+            <table>
+              <caption class="sr-only">
+                Mediciones de la estación, de la más reciente a la más antigua.
+              </caption>
+              <thead>
+                <tr>
+                  <th scope="col">Fecha y hora</th>
+                  <th scope="col">Temperatura</th>
+                  <th scope="col">Humedad</th>
+                  <th scope="col">Gas y humo</th>
+                  <th scope="col">Calidad del aire</th>
+                  <th scope="col">Monóxido</th>
+                  <th scope="col">Sol (UV)</th>
+                </tr>
+              </thead>
+              <tbody id="history">
+                <tr>
+                  <td colspan="7" class="empty">Todavía no hay mediciones.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="pagination">
             <button id="previous" class="button secondary" disabled>
-              ← Anterior</button
+              ← Más recientes</button
+            ><p id="page-label">0 mediciones</p
             ><button id="next" class="button secondary" disabled>
-              Siguiente →
+              Más antiguas →
             </button>
           </div>
+          <button id="export" class="button secondary export">
+            <svg class="icon" aria-hidden="true"><use href="#i-download" /></svg
+            >Descargar planilla (se abre con Excel)
+          </button>
         </div>
-      </section>
+      </details>
 
-      <section class="pipeline" aria-label="Flujo de datos">
-        <h2 class="sr-only">Flujo de datos</h2>
-        <ol>
-          <li><b>1</b><span>Sensores + ESP32</span></li>
-          <li><b>2</b><span>Enlace LoRa</span></li>
-          <li><b>3</b><span>Estación base</span></li>
-          <li><b>4</b><span>Eco-Red</span></li>
-        </ol>
-      </section>
+      <details class="panel more tech">
+        <summary>
+          <svg class="icon" aria-hidden="true"><use href="#i-tool" /></svg
+          >Información técnica
+          <svg class="icon chevron" aria-hidden="true"><use href="#i-chevron" /></svg>
+        </summary>
+        <div class="more-body">
+          <p class="tech-intro">
+            Esta sección es para quien instala o revisa los equipos.
+          </p>
+          <dl class="tech-list">
+            <div>
+              <dt>Señal de radio (LoRa)</dt>
+              <dd id="signal-quality">—</dd>
+            </div>
+            <div>
+              <dt>Intensidad (RSSI)</dt>
+              <dd id="rssi">—</dd>
+            </div>
+            <div>
+              <dt>Relación señal/ruido (SNR)</dt>
+              <dd id="snr">—</dd>
+            </div>
+            <div>
+              <dt>Lecturas de los sensores (0 a 4095)</dt>
+              <dd id="raw-readings">—</dd>
+            </div>
+            <div>
+              <dt>Equipos</dt>
+              <dd>Sensores + WROOM32 → Heltec V4 → Heltec V3 → servidor</dd>
+            </div>
+            <div>
+              <dt>Zona horaria</dt>
+              <dd id="timezone">Horario del dispositivo</dd>
+            </div>
+          </dl>
+          <p class="tech-note">
+            Los niveles de gas, aire y monóxido son orientativos y dependen de
+            la calibración de los sensores. No reemplazan a un detector de
+            monóxido de carbono certificado.
+          </p>
+          <a class="tech-link" href="/docs" target="_blank" rel="noopener"
+            >Documentación de la API ↗</a
+          >
+        </div>
+      </details>
     </main>
 
     <footer>
       <div class="footer-inner">
-        <span class="footer-brand"
-          ><img src="/static/logo.svg" alt="" width="28" height="24" />Eco-Red ·
-          Conectados con nuestro entorno.</span
-        ><span id="timezone">Horario del dispositivo</span>
+        <img src="/static/logo.svg" alt="" width="34" height="29" /><span
+          >Eco-Red · Tu entorno, más cerca.</span
+        >
       </div>
     </footer>
   </body>
