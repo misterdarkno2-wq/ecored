@@ -1,4 +1,4 @@
-<p align="center"><img src="app/static/logo.svg" alt="Eco-Red" width="120" /></p>
+<p align="center"><img src="app/static/img/logo.svg" alt="Eco-Red" width="120" /></p>
 
 # EcoRed · Monitoreo ambiental
 
@@ -18,11 +18,30 @@ Incluye el [receptor Heltec V3 adaptado](firmware/README.md) para el paquete del
 - Estaciones, última lectura, historial paginado, resumen y exportación CSV.
 - Panel adaptable a móvil: temperatura, humedad, MQ2, MQ135, MQ9, UV, RSSI y SNR, gráficos y actualización cada 30 segundos.
 - Panel pensado para personas mayores: letra grande (con botón para agrandarla), mensaje principal «Todo está bien / Ponga atención / ¡Cuidado!», estados con color, icono y palabra, y un consejo práctico para cada dato. Los detalles técnicos quedan en una sección desplegable.
-- Los límites de gas y humo, calidad del aire, monóxido de carbono y radiación UV (lectura del ADC, 0 a 4095) están al inicio de `app/static/app.js`, en `LIMITS`. Son orientativos: ajústelos según la calibración de sus sensores. El panel no reemplaza a un detector de monóxido certificado.
+- Los límites de gas y humo, calidad del aire, monóxido de carbono y radiación UV (lectura del ADC, 0 a 4095) están al inicio de `app/static/js/app.js`, en `LIMITS`. Son orientativos: ajústelos según la calibración de sus sensores. El panel no reemplaza a un detector de monóxido certificado.
 - Receptor V3 con panel local, cola de envío, reintentos y prevención de duplicados por `sample_id`.
 - Estados explícitos para ausencia de lecturas, datos antiguos y fallos de conexión. No se generan datos ficticios automáticamente.
 - SQL parametrizado, transacciones, cierre de conexiones y respuestas sin credenciales.
 - Esquema SQL, Docker Compose y pruebas de API y de integración con MySQL 8.4 en GitHub Actions.
+
+## Panel web
+
+El panel está en `app/static/`, con cada tipo de archivo en su carpeta:
+
+```text
+app/static/
+├── index.html           Estructura de la página (solo HTML)
+├── css/styles.css       Estilos: colores, tamaños, modo oscuro y móvil
+├── js/app.js            Lógica: consulta la API, interpreta los datos y dibuja el gráfico
+├── js/preferencias.js   Recuerda la opción «Agrandar letra»
+├── js/demo.js           Modo de demostración con datos de ejemplo
+├── img/                 Logotipo (SVG) e icono para el teléfono
+└── fonts/               Tipografía Poppins (licencia OFL)
+```
+
+- **Con el servidor** (`/`): muestra los datos reales de la API.
+- **Sin servidor**: abre `app/static/index.html` con doble clic y verás el panel con datos de ejemplo y un aviso amarillo de «Modo de demostración». También se activa agregando `?demo` a la dirección.
+- **Enlace público de demostración (GitHub Pages)**: el flujo `.github/workflows/pages.yml` publica `app/static/` en `https://misterdarkno2-wq.github.io/ecored/` cada vez que cambia en `main`. Para activarlo, una sola vez: *Settings → Pages → Build and deployment → Source: GitHub Actions*, y luego *Actions → Publicar panel de demostración → Run workflow*.
 
 ## Inicio con Docker
 
@@ -137,7 +156,7 @@ Para registrar otra estación, envía `POST /api/stations` con la misma cabecera
 
 Historial, resumen y CSV admiten `start` y `end` con zona horaria, ambos inclusivos. Historial admite `limit` (1–1000) y `offset`. Ejemplo: `/api/measurements?station_id=EST-001&start=2026-10-07T00:00:00Z&limit=50&offset=0`. Codifica `+` como `%2B` si usas desplazamientos positivos en la URL.
 
-El gráfico muestra hasta las **1000 lecturas más recientes** del período; el historial permite recorrer todas y el resumen se calcula sobre todas. El CSV admite hasta **10000 filas**; si se excede ese límite, pide un período más pequeño, sin truncar silenciosamente. La condición «sin lecturas recientes» aparece después de 10 minutos sin mediciones nuevas; ajusta ese umbral en `app/static/app.js` si tu estación mide con menos frecuencia.
+El gráfico muestra hasta las **1000 lecturas más recientes** del período; el historial permite recorrer todas y el resumen se calcula sobre todas. El CSV admite hasta **10000 filas**; si se excede ese límite, pide un período más pequeño, sin truncar silenciosamente. La condición «sin lecturas recientes» aparece después de 10 minutos sin mediciones nuevas; ajusta ese umbral (`STALE_MINUTES`) en `app/static/js/app.js` si tu estación mide con menos frecuencia.
 
 ## Pruebas
 

@@ -34,6 +34,10 @@ app = FastAPI(
     description="Recepción de lecturas LoRa, consulta de datos actuales e historial. Fechas en UTC.",
 )
 STATIC = Path(__file__).parent / "static"
+# El panel usa rutas relativas (css/, js/, img/, fonts/) para funcionar igual
+# servido aquí, abierto desde el disco o publicado en GitHub Pages.
+for folder in ("css", "js", "img", "fonts"):
+    app.mount(f"/{folder}", StaticFiles(directory=STATIC / folder), name=folder)
 app.mount("/static", StaticFiles(directory=STATIC), name="static")
 api_key = APIKeyHeader(name="X-API-Key", auto_error=False)
 

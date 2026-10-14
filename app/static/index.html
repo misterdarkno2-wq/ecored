@@ -10,24 +10,13 @@
       content="Eco-Red: vea de forma sencilla cómo está el ambiente de su hogar: temperatura, humedad, gas y humo, calidad del aire, monóxido de carbono y radiación UV."
     />
     <title>Eco-Red · ¿Cómo está el ambiente?</title>
-    <link rel="icon" href="/static/logo.svg" type="image/svg+xml" />
-    <link rel="apple-touch-icon" href="/static/logo-180.png" />
-    <link
-      rel="preload"
-      href="/static/fonts/poppins-600.woff2"
-      as="font"
-      type="font/woff2"
-      crossorigin
-    />
-    <link rel="stylesheet" href="/static/styles.css" />
-    <script>
-      // Aplicar la letra grande antes de dibujar la página, sin parpadeo.
-      try {
-        if (localStorage.getItem("ecored-letra") === "grande")
-          document.documentElement.classList.add("large-text");
-      } catch (e) {}
-    </script>
-    <script src="/static/app.js" defer></script>
+    <link rel="icon" href="img/logo.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="img/logo-180.png" />
+    <link rel="stylesheet" href="css/styles.css" />
+    <script src="js/preferencias.js"></script>
+    <!-- demo.js solo actúa sin servidor (disco, GitHub Pages) o con ?demo -->
+    <script src="js/demo.js" defer></script>
+    <script src="js/app.js" defer></script>
   </head>
   <body>
     <svg width="0" height="0" class="sprite" aria-hidden="true">
@@ -105,7 +94,7 @@
 
     <header class="topbar">
       <a class="brand" href="/" aria-label="Eco-Red, inicio"
-        ><img src="/static/logo.svg" alt="" width="46" height="40" /><span
+        ><img src="img/logo.svg" alt="" width="46" height="40" /><span
           >Eco-Red</span
         ></a
       >
@@ -413,7 +402,7 @@
 
     <footer>
       <div class="footer-inner">
-        <img src="/static/logo.svg" alt="" width="34" height="29" /><span
+        <img src="img/logo.svg" alt="" width="34" height="29" /><span
           >Eco-Red · Tu entorno, más cerca.</span
         >
       </div>
