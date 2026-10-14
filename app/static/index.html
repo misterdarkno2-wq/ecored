@@ -3,50 +3,116 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#123e33" />
+    <meta name="theme-color" content="#0f3a12" />
+    <meta name="color-scheme" content="light dark" />
     <meta
       name="description"
-      content="EcoRed: temperatura, humedad, sensores MQ y UV, enlace LoRa e historial."
+      content="Eco-Red: temperatura, humedad, sensores MQ y UV, enlace LoRa e historial."
     />
-    <title>EcoRed · Panel ambiental</title>
+    <title>Eco-Red · Panel ambiental</title>
     <link rel="icon" href="/static/logo.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/static/logo-180.png" />
+    <link
+      rel="preload"
+      href="/static/fonts/poppins-600.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
     <link rel="stylesheet" href="/static/styles.css" />
     <script src="/static/app.js" defer></script>
   </head>
   <body>
+    <svg width="0" height="0" class="sprite" aria-hidden="true">
+      <symbol id="i-temp" viewBox="0 0 24 24">
+        <path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0Z" />
+        <path d="M11.5 10v7" />
+      </symbol>
+      <symbol id="i-drop" viewBox="0 0 24 24">
+        <path d="M12 2.7 17.7 8.4a8 8 0 1 1-11.3 0Z" />
+      </symbol>
+      <symbol id="i-flame" viewBox="0 0 24 24">
+        <path
+          d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.4-.5-2-1-3-1.1-2.1-.2-4.1 2-6 .5 2.5 2 4.9 4 6.5s3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.2.4-2.3 1-3a2.5 2.5 0 0 0 2.5 2.5Z"
+        />
+      </symbol>
+      <symbol id="i-wind" viewBox="0 0 24 24">
+        <path
+          d="M9.6 4.6A2 2 0 1 1 11 8H2m10.6 11.4A2 2 0 1 0 14 16H2m15.7-8.3A2.5 2.5 0 1 1 19.5 12H2"
+        />
+      </symbol>
+      <symbol id="i-cloud" viewBox="0 0 24 24">
+        <path d="M18 10h-1.3A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10Z" />
+      </symbol>
+      <symbol id="i-sun" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="4.5" />
+        <path
+          d="M12 1.5v2m0 17v2m10.5-10.5h-2m-17 0h-2m17.4-7.4-1.4 1.4M6 18l-1.4 1.4m14.8 0L18 18M6 6 4.6 4.6"
+        />
+      </symbol>
+      <symbol id="i-signal" viewBox="0 0 24 24">
+        <path d="M3 20h.01M8 20v-4M13 20v-8M18 20V7" />
+        <path d="M18 3.5v.01" />
+      </symbol>
+      <symbol id="i-refresh" viewBox="0 0 24 24">
+        <path d="M21 12a9 9 0 1 1-2.6-6.4L21 8" />
+        <path d="M21 3v5h-5" />
+      </symbol>
+      <symbol id="i-download" viewBox="0 0 24 24">
+        <path d="M12 3v12m0 0-4.5-4.5M12 15l4.5-4.5M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" />
+      </symbol>
+      <symbol id="i-external" viewBox="0 0 24 24">
+        <path d="M14 4h6v6m0-6-9 9" />
+        <path d="M18 14v4a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4" />
+      </symbol>
+      <symbol id="i-pin" viewBox="0 0 24 24">
+        <path d="M12 21s7-6.2 7-11.5a7 7 0 0 0-14 0C5 14.8 12 21 12 21Z" />
+        <circle cx="12" cy="9.5" r="2.5" />
+      </symbol>
+    </svg>
+
     <header class="topbar">
-      <a class="brand" href="/" aria-label="EcoRed, inicio"
-        ><img src="/static/logo.svg" alt="" width="36" height="36" />Eco<span
-          >Red</span
+      <a class="brand" href="/" aria-label="Eco-Red, inicio"
+        ><img src="/static/logo.svg" alt="" width="46" height="40" /><span
+          >Eco-Red</span
         ></a
-      ><span class="toplabel">RED DE MONITOREO AMBIENTAL</span
+      ><span class="toplabel">Red de monitoreo ambiental</span
       ><a class="api-link" href="/docs" target="_blank" rel="noopener"
-        >Documentación API ↗</a
-      >
+        >Documentación API
+        <svg class="icon" aria-hidden="true"><use href="#i-external" /></svg
+      ></a>
     </header>
+
     <main>
-      <section class="heading">
-        <div>
-          <p class="eyebrow">OBSERVA. CONECTA. COMPRENDE.</p>
+      <section class="hero">
+        <div class="hero-copy">
+          <p class="eyebrow">Observa · Conecta · Comprende</p>
           <h1>Tu entorno, más cerca.</h1>
           <p class="subtitle">
             Datos del WROOM32 y tu enlace LoRa, en un solo lugar.
           </p>
+          <div class="connection">
+            <span class="dot" id="status-dot"></span
+            ><span id="connection-status" role="status">Conectando…</span>
+          </div>
         </div>
-        <div class="connection">
-          <span class="dot" id="status-dot"></span
-          ><span id="connection-status" role="status">Conectando…</span>
+        <div class="hero-art" aria-hidden="true">
+          <img src="/static/logo.svg" alt="" width="200" height="173" />
         </div>
       </section>
+
       <section class="toolbar" aria-label="Filtros">
         <div class="station-field">
-          <label for="station">ESTACIÓN</label
+          <label for="station">Estación</label
           ><select id="station">
             <option value="">Cargando estaciones…</option></select
-          ><span id="location">—</span>
+          ><span class="location"
+            ><svg class="icon" aria-hidden="true"><use href="#i-pin" /></svg
+            ><span id="location">—</span></span
+          >
         </div>
         <div class="range-field">
-          <label for="range">PERÍODO DEL HISTORIAL</label
+          <label for="range">Período del historial</label
           ><select id="range">
             <option value="1">Última hora</option>
             <option value="24" selected>Últimas 24 horas</option>
@@ -54,64 +120,109 @@
             <option value="720">Últimos 30 días</option>
           </select>
         </div>
-        <button id="refresh" class="button secondary">↻ Actualizar</button>
+        <button id="refresh" class="button primary">
+          <svg class="icon" aria-hidden="true"><use href="#i-refresh" /></svg
+          >Actualizar
+        </button>
       </section>
+
       <div id="notice" class="notice" role="alert" hidden></div>
+
       <section class="current-heading">
         <h2>Condiciones actuales</h2>
         <p id="updated">Esperando la primera medición</p>
       </section>
+
       <section class="metrics" aria-label="Última medición">
-        <article class="metric featured">
+        <article class="metric featured" data-metric="temperature">
           <div class="metric-label">
-            Temperatura <span aria-hidden="true">☀</span>
+            Temperatura
+            <span class="chip"
+              ><svg class="icon" aria-hidden="true">
+                <use href="#i-temp" /></svg
+            ></span>
           </div>
           <p class="value"><span id="temperature">—</span><small>°C</small></p>
           <p class="metric-note">Temperatura del aire</p>
         </article>
-        <article class="metric">
+        <article class="metric" data-metric="humidity">
           <div class="metric-label">
-            Humedad <span aria-hidden="true">◈</span>
+            Humedad
+            <span class="chip"
+              ><svg class="icon" aria-hidden="true">
+                <use href="#i-drop" /></svg
+            ></span>
           </div>
           <p class="value"><span id="humidity">—</span><small>%</small></p>
           <p class="metric-note">Humedad relativa</p>
         </article>
-        <article class="metric">
-          <div class="metric-label">MQ2 <span aria-hidden="true">◎</span></div>
-          <p class="value"><span id="mq2">—</span><small>ADC</small></p>
-          <p class="metric-note">Lectura analógica del sensor</p>
-        </article>
-        <article class="metric">
+        <article class="metric" data-metric="mq2">
           <div class="metric-label">
-            MQ135 <span aria-hidden="true">≋</span>
+            MQ2
+            <span class="chip"
+              ><svg class="icon" aria-hidden="true">
+                <use href="#i-flame" /></svg
+            ></span>
+          </div>
+          <p class="value"><span id="mq2">—</span><small>ADC</small></p>
+          <p class="metric-note">Gases combustibles y humo</p>
+        </article>
+        <article class="metric" data-metric="mq135">
+          <div class="metric-label">
+            MQ135
+            <span class="chip"
+              ><svg class="icon" aria-hidden="true">
+                <use href="#i-wind" /></svg
+            ></span>
           </div>
           <p class="value"><span id="mq135">—</span><small>ADC</small></p>
-          <p class="metric-note">Lectura analógica del sensor</p>
+          <p class="metric-note">Calidad del aire</p>
         </article>
-        <article class="metric">
-          <div class="metric-label">MQ9 <span aria-hidden="true">◈</span></div>
+        <article class="metric" data-metric="mq9">
+          <div class="metric-label">
+            MQ9
+            <span class="chip"
+              ><svg class="icon" aria-hidden="true">
+                <use href="#i-cloud" /></svg
+            ></span>
+          </div>
           <p class="value"><span id="mq9">—</span><small>ADC</small></p>
-          <p class="metric-note">Lectura analógica del sensor</p>
+          <p class="metric-note">Monóxido de carbono</p>
         </article>
-        <article class="metric">
-          <div class="metric-label">UV <span aria-hidden="true">☀</span></div>
+        <article class="metric" data-metric="uv">
+          <div class="metric-label">
+            UV
+            <span class="chip"
+              ><svg class="icon" aria-hidden="true">
+                <use href="#i-sun" /></svg
+            ></span>
+          </div>
           <p class="value"><span id="uv">—</span><small>ADC</small></p>
-          <p class="metric-note">Lectura analógica del sensor</p>
+          <p class="metric-note">Radiación ultravioleta</p>
         </article>
       </section>
+
       <section class="panel link-panel" aria-label="Enlace LoRa">
-        <div>
+        <span class="chip link-chip"
+          ><svg class="icon" aria-hidden="true"><use href="#i-signal" /></svg
+        ></span>
+        <div class="link-title">
           <h2>Enlace LoRa</h2>
           <p>WROOM32 → Heltec V4 → Heltec V3</p>
         </div>
-        <div><span>RSSI</span><strong id="rssi">—</strong></div>
-        <div><span>SNR</span><strong id="snr">—</strong></div>
+        <div class="link-stat">
+          <span>RSSI</span><strong id="rssi">—</strong>
+        </div>
+        <div class="link-stat">
+          <span>SNR</span><strong id="snr">—</strong>
+        </div>
       </section>
+
       <section class="analysis-grid">
         <article class="panel chart-panel">
           <div class="panel-heading">
             <div>
-              <p class="eyebrow">EVOLUCIÓN DEL ENTORNO</p>
+              <p class="eyebrow">Evolución del entorno</p>
               <h2>Tendencia de mediciones</h2>
             </div>
             <label class="sr-only" for="metric">Variable del gráfico</label
@@ -129,6 +240,7 @@
           <div
             id="chart"
             class="chart"
+            data-metric="temperature"
             role="img"
             aria-label="Sin lecturas para graficar"
           >
@@ -138,39 +250,40 @@
             Los datos se actualizan cada 30 segundos.
           </p>
         </article>
+
         <article class="panel summary-panel">
-          <p class="eyebrow">EN EL PERÍODO SELECCIONADO</p>
+          <p class="eyebrow">En el período seleccionado</p>
           <h2>Resumen ambiental</h2>
           <dl>
-            <div>
+            <div data-metric="temperature">
               <dt>Temperatura mínima</dt>
               <dd id="temp-min">—</dd>
             </div>
-            <div>
+            <div data-metric="temperature">
               <dt>Temperatura máxima</dt>
               <dd id="temp-max">—</dd>
             </div>
-            <div>
+            <div data-metric="temperature">
               <dt>Temperatura media</dt>
               <dd id="temp-avg">—</dd>
             </div>
-            <div>
+            <div data-metric="humidity">
               <dt>Humedad media</dt>
               <dd id="humidity-avg">—</dd>
             </div>
-            <div>
+            <div data-metric="mq2">
               <dt>MQ2 medio</dt>
               <dd id="mq2-avg">—</dd>
             </div>
-            <div>
+            <div data-metric="mq135">
               <dt>MQ135 medio</dt>
               <dd id="mq135-avg">—</dd>
             </div>
-            <div>
+            <div data-metric="mq9">
               <dt>MQ9 medio</dt>
               <dd id="mq9-avg">—</dd>
             </div>
-            <div>
+            <div data-metric="uv">
               <dt>UV máximo</dt>
               <dd id="uv-max">—</dd>
             </div>
@@ -180,13 +293,17 @@
           </div>
         </article>
       </section>
+
       <section class="panel history-panel">
         <div class="panel-heading">
           <div>
-            <p class="eyebrow">REGISTRO DE LA ESTACIÓN</p>
+            <p class="eyebrow">Registro de la estación</p>
             <h2>Historial de mediciones</h2>
           </div>
-          <button id="export" class="button secondary">↓ Descargar CSV</button>
+          <button id="export" class="button secondary">
+            <svg class="icon" aria-hidden="true"><use href="#i-download" /></svg
+            >Descargar CSV
+          </button>
         </div>
         <div class="table-scroll">
           <table>
@@ -225,17 +342,25 @@
           </div>
         </div>
       </section>
+
       <section class="pipeline" aria-label="Flujo de datos">
-        <span>01 <strong>Sensores + ESP32</strong></span
-        ><b aria-hidden="true">→</b><span>02 <strong>Enlace LoRa</strong></span
-        ><b aria-hidden="true">→</b
-        ><span>03 <strong>Estación base</strong></span
-        ><b aria-hidden="true">→</b><span>04 <strong>EcoRed</strong></span>
+        <h2 class="sr-only">Flujo de datos</h2>
+        <ol>
+          <li><b>1</b><span>Sensores + ESP32</span></li>
+          <li><b>2</b><span>Enlace LoRa</span></li>
+          <li><b>3</b><span>Estación base</span></li>
+          <li><b>4</b><span>Eco-Red</span></li>
+        </ol>
       </section>
     </main>
+
     <footer>
-      <span>EcoRed · Conectados con nuestro entorno.</span
-      ><span id="timezone">Horario del dispositivo</span>
+      <div class="footer-inner">
+        <span class="footer-brand"
+          ><img src="/static/logo.svg" alt="" width="28" height="24" />Eco-Red ·
+          Conectados con nuestro entorno.</span
+        ><span id="timezone">Horario del dispositivo</span>
+      </div>
     </footer>
   </body>
 </html>

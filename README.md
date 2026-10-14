@@ -1,3 +1,5 @@
+<p align="center"><img src="app/static/logo.svg" alt="Eco-Red" width="120" /></p>
+
 # EcoRed · Monitoreo ambiental
 
 Servidor **FastAPI**, conexión directa a **MySQL con PyMySQL** y panel web en español. Implementa la parte servidor/base de datos/página del flujo:

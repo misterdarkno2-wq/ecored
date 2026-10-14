@@ -11,7 +11,7 @@ const char PAGINA[] PROGMEM = R"rawliteral(
 <meta name="viewport"
 content="width=device-width, initial-scale=1.0">
 
-<title>ECORED</title>
+<title>Eco-Red · Receptor</title>
 
 <style>
 
@@ -21,26 +21,36 @@ content="width=device-width, initial-scale=1.0">
 
 body {
     margin: 0;
-    font-family: Arial, Helvetica, sans-serif;
-    background: #07111f;
+    font-family: "Segoe UI", system-ui, Arial, sans-serif;
+    background: #0b170b;
     color: white;
 }
 
 header {
     padding: 25px;
     text-align: center;
-    background: #0d1b2a;
-    border-bottom: 1px solid #1d3557;
+    background: linear-gradient(100deg, #0f3a12, #1d5410);
+    border-bottom: 4px solid #8ed13d;
 }
 
 header h1 {
     margin: 0;
     font-size: 32px;
+    color: #ffe85c;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+}
+
+.logo {
+    width: 52px;
+    height: 45px;
 }
 
 header p {
     margin-top: 8px;
-    color: #9fb3c8;
+    color: #c6e89a;
 }
 
 .estado {
@@ -48,8 +58,9 @@ header p {
     margin-top: 10px;
     padding: 7px 14px;
     border-radius: 20px;
-    background: #163c2c;
-    color: #6fffa8;
+    background: #ffe85c;
+    color: #0f3a12;
+    font-weight: bold;
 }
 
 .contenedor {
@@ -66,14 +77,19 @@ header p {
 }
 
 .card {
-    background: #101f33;
+    background: #122313;
     padding: 22px;
-    border-radius: 14px;
-    border: 1px solid #213954;
+    border-radius: 16px;
+    border: 1px solid #23401f;
+    border-top: 4px solid #8ed13d;
+}
+
+.card:nth-child(even) {
+    border-top-color: #ffe85c;
 }
 
 .nombre {
-    color: #8da6bf;
+    color: #a3b896;
     font-size: 14px;
 }
 
@@ -85,26 +101,27 @@ header p {
 
 .unidad {
     font-size: 15px;
-    color: #8da6bf;
+    color: #8ed13d;
 }
 
 .seccion {
     margin-top: 25px;
-    background: #101f33;
+    background: #122313;
     padding: 20px;
-    border-radius: 14px;
-    border: 1px solid #213954;
+    border-radius: 16px;
+    border: 1px solid #23401f;
 }
 
 .seccion h2 {
     margin-top: 0;
+    color: #8ed13d;
 }
 
 .info {
     display: flex;
     justify-content: space-between;
     padding: 9px 0;
-    border-bottom: 1px solid #1d3148;
+    border-bottom: 1px solid #23401f;
 }
 
 .info:last-child {
@@ -113,7 +130,7 @@ header p {
 
 footer {
     text-align: center;
-    color: #667d94;
+    color: #a3b896;
     padding: 25px;
 }
 
@@ -125,7 +142,23 @@ footer {
 
 <header>
 
-<h1>🌱 ECORED</h1>
+<h1><svg class="logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 86.6" aria-hidden="true">
+<defs>
+<clipPath id="ecored-hex"><path d="M97.4 38.8a9 9 0 0 1 0 9L77.6 82.1a9 9 0 0 1-7.8 4.5H30.2a9 9 0 0 1-7.8-4.5L2.6 47.8a9 9 0 0 1 0-9L22.4 4.5A9 9 0 0 1 30.2 0h39.6a9 9 0 0 1 7.8 4.5Z"/></clipPath>
+</defs>
+<g clip-path="url(#ecored-hex)" stroke="#1d5410" stroke-width="3.1" stroke-linecap="round" stroke-linejoin="round">
+<rect width="100" height="86.6" fill="#8ed13d" stroke="none"/>
+<path fill="#ffe85c" stroke="none" d="M-2 59C4 53 9 50.5 14.5 50.5S23.4 52 25 57C26.6 52 29.0 45 37.5 45S48.4 52 50 57C51.6 52 54.0 45 62.5 45S73.4 52 75 57C76.6 52 80 50.5 85.5 50.5S96 53 102 59V90H-2Z"/>
+<path fill="none" d="M-2 59C4 53 9 50.5 14.5 50.5S23.4 52 25 57C27.2 60 29.4 62 29.4 65.5C29.4 69.5 27.4 72 25 72S20.6 69.5 20.6 65.5S22.8 60 25 57C26.6 52 29.0 45 37.5 45S48.4 52 50 57C52.2 60 54.4 62 54.4 65.5C54.4 69.5 52.4 72 50 72S45.6 69.5 45.6 65.5S47.8 60 50 57C51.6 52 54.0 45 62.5 45S73.4 52 75 57C77.2 60 79.4 62 79.4 65.5C79.4 69.5 77.4 72 75 72S70.6 69.5 70.6 65.5S72.8 60 75 57C76.6 52 80 50.5 85.5 50.5S96 53 102 59"/>
+<g fill="#ffe85c">
+<ellipse cx="14.5" cy="41.2" rx="7" ry="8.2"/>
+<ellipse cx="37" cy="35.4" rx="7.2" ry="8.5"/>
+<ellipse cx="63" cy="35.4" rx="7.2" ry="8.5"/>
+<ellipse cx="85.5" cy="41.2" rx="7" ry="8.2"/>
+</g>
+</g>
+</svg>
+Eco-Red</h1>
 
 <p>Red de monitoreo ambiental</p>
 
@@ -249,7 +282,7 @@ Conectando...
 </div>
 
 <footer>
-ECORED • Sistema de monitoreo ambiental
+Eco-Red • Sistema de monitoreo ambiental
 </footer>
 
 
@@ -303,13 +336,13 @@ async function actualizar() {
         if(d.online) {
 
             estado.innerText =
-                "● ECORED EN LÍNEA";
+                "● ECO-RED EN LÍNEA";
 
             estado.style.background =
-                "#163c2c";
+                "#ffe85c";
 
             estado.style.color =
-                "#6fffa8";
+                "#0f3a12";
 
         } else {
 

@@ -1,1 +1,17 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40"><rect width="40" height="40" rx="12" fill="#123e33"/><path d="M29 10C14 9 9 17 13 24c5 8 17 2 16-14Z" fill="#b8dc86"/><path d="m12 30 12-14" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 86.6">
+  <title>Eco-Red</title>
+  <defs>
+    <clipPath id="ecored-hex"><path d="M97.4 38.8a9 9 0 0 1 0 9L77.6 82.1a9 9 0 0 1-7.8 4.5H30.2a9 9 0 0 1-7.8-4.5L2.6 47.8a9 9 0 0 1 0-9L22.4 4.5A9 9 0 0 1 30.2 0h39.6a9 9 0 0 1 7.8 4.5Z"/></clipPath>
+  </defs>
+  <g clip-path="url(#ecored-hex)" stroke="#1d5410" stroke-width="3.1" stroke-linecap="round" stroke-linejoin="round">
+    <rect width="100" height="86.6" fill="#8ed13d" stroke="none"/>
+    <path fill="#ffe85c" stroke="none" d="M-2 59C4 53 9 50.5 14.5 50.5S23.4 52 25 57C26.6 52 29.0 45 37.5 45S48.4 52 50 57C51.6 52 54.0 45 62.5 45S73.4 52 75 57C76.6 52 80 50.5 85.5 50.5S96 53 102 59V90H-2Z"/>
+    <path fill="none" d="M-2 59C4 53 9 50.5 14.5 50.5S23.4 52 25 57C27.2 60 29.4 62 29.4 65.5C29.4 69.5 27.4 72 25 72S20.6 69.5 20.6 65.5S22.8 60 25 57C26.6 52 29.0 45 37.5 45S48.4 52 50 57C52.2 60 54.4 62 54.4 65.5C54.4 69.5 52.4 72 50 72S45.6 69.5 45.6 65.5S47.8 60 50 57C51.6 52 54.0 45 62.5 45S73.4 52 75 57C77.2 60 79.4 62 79.4 65.5C79.4 69.5 77.4 72 75 72S70.6 69.5 70.6 65.5S72.8 60 75 57C76.6 52 80 50.5 85.5 50.5S96 53 102 59"/>
+    <g fill="#ffe85c">
+      <ellipse cx="14.5" cy="41.2" rx="7" ry="8.2"/>
+      <ellipse cx="37" cy="35.4" rx="7.2" ry="8.5"/>
+      <ellipse cx="63" cy="35.4" rx="7.2" ry="8.5"/>
+      <ellipse cx="85.5" cy="41.2" rx="7" ry="8.2"/>
+    </g>
+  </g>
+</svg>

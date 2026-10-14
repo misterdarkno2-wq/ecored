@@ -137,6 +137,7 @@ function drawChart() {
   const readings = [...state.chart].reverse();
   const valid = readings.filter((r) => r[metric] != null);
   const container = $("chart");
+  container.dataset.metric = metric;
   if (!valid.length) {
     container.replaceChildren();
     const p = document.createElement("p");
@@ -146,8 +147,9 @@ function drawChart() {
     container.setAttribute("aria-label", p.textContent);
     return;
   }
-  const width = 720,
-    height = 220,
+  // Dibujar al tamaño real del contenedor para que el texto no se encoja en móvil.
+  const width = Math.max(container.clientWidth, 280),
+    height = Math.max(container.clientHeight, 180),
     left = 52,
     right = 15,
     top = 14,
@@ -174,6 +176,22 @@ function drawChart() {
     svg.append(el);
     return el;
   };
+  const gradient = add("linearGradient", {
+    id: "chart-fill",
+    x1: 0,
+    x2: 0,
+    y1: 0,
+    y2: 1,
+  });
+  for (const [offset, opacity] of [
+    [0, 0.32],
+    [1, 0],
+  ]) {
+    const stop = document.createElementNS(svg.namespaceURI, "stop");
+    stop.setAttribute("offset", offset);
+    stop.setAttribute("stop-opacity", opacity);
+    gradient.append(stop);
+  }
   for (let i = 0; i < 5; i++) {
     const value = min + ((max - min) * i) / 4,
       pos = y(value);
@@ -182,8 +200,7 @@ function drawChart() {
       x2: width - right,
       y1: pos,
       y2: pos,
-      stroke: "#e8ede3",
-      "stroke-dasharray": "4 5",
+      class: "grid",
     });
     add(
       "text",
@@ -191,35 +208,37 @@ function drawChart() {
         x: left - 10,
         y: pos + 4,
         "text-anchor": "end",
-        fill: "#7d887b",
-        "font-size": 10,
+        class: "axis",
       },
       fmt(value),
     );
   }
   let segment = [];
+  const base = height - bottom;
   const flush = () => {
-    if (segment.length)
-      add("polyline", {
-        points: segment.join(" "),
-        fill: "none",
-        stroke: "#659149",
-        "stroke-width": 2.5,
-        "stroke-linejoin": "round",
+    if (segment.length) {
+      const [firstX] = segment[0],
+        [lastX] = segment.at(-1);
+      add("polygon", {
+        points: `${firstX},${base} ${segment.join(" ")} ${lastX},${base}`,
+        class: "area",
       });
+      add("polyline", { points: segment.join(" "), class: "line" });
+    }
     segment = [];
   };
   for (const reading of readings) {
     if (reading[metric] == null) flush();
-    else segment.push(`${x(reading)},${y(reading[metric])}`);
+    else segment.push([x(reading), y(reading[metric])]);
   }
   flush();
   for (const reading of valid) {
+    const latest = reading === valid.at(-1);
     const dot = add("circle", {
       cx: x(reading),
       cy: y(reading[metric]),
-      r: valid.length < 80 ? 3 : 1.5,
-      fill: "#659149",
+      r: latest ? 5 : valid.length < 80 ? 3 : 1.5,
+      class: latest ? "latest" : "point",
     });
     const title = document.createElementNS(svg.namespaceURI, "title");
     title.textContent = `${date.format(new Date(reading.measured_at))}: ${fmt(reading[metric], units[metric])}`;
@@ -233,7 +252,7 @@ function drawChart() {
   );
   add(
     "text",
-    { x: left, y: height - 8, fill: "#7d887b", "font-size": 10 },
+    { x: left, y: height - 8, class: "axis" },
     time.format(new Date(first)),
   );
   if (last !== first)
@@ -243,8 +262,7 @@ function drawChart() {
         x: width - right,
         y: height - 8,
         "text-anchor": "end",
-        fill: "#7d887b",
-        "font-size": 10,
+        class: "axis",
       },
       time.format(new Date(last)),
     );
@@ -386,6 +404,13 @@ $("range").addEventListener("change", () => {
   refresh();
 });
 $("metric").addEventListener("change", drawChart);
+let resizeFrame;
+new ResizeObserver(() => {
+  cancelAnimationFrame(resizeFrame);
+  resizeFrame = requestAnimationFrame(() => {
+    if (state.chart.length) drawChart();
+  });
+}).observe($("chart"));
 $("refresh").addEventListener("click", () => refresh());
 $("previous").addEventListener("click", () => {
   state.offset = Math.max(0, state.offset - state.limit);
