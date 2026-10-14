@@ -189,22 +189,22 @@ Conectando...
 </div>
 
 <div class="card">
-<div class="nombre">MQ2</div>
+<div class="nombre">GAS Y HUMO</div>
 <div class="valor" id="mq2">--</div>
 </div>
 
 <div class="card">
-<div class="nombre">MQ135</div>
+<div class="nombre">CALIDAD DEL AIRE</div>
 <div class="valor" id="mq135">--</div>
 </div>
 
 <div class="card">
-<div class="nombre">MQ9</div>
+<div class="nombre">MONÓXIDO DE CARBONO</div>
 <div class="valor" id="mq9">--</div>
 </div>
 
 <div class="card">
-<div class="nombre">UV · ADC</div>
+<div class="nombre">RADIACIÓN UV</div>
 <div class="valor" id="uv">--</div>
 </div>
 

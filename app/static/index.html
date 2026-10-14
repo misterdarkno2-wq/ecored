@@ -7,7 +7,7 @@
     <meta name="color-scheme" content="light dark" />
     <meta
       name="description"
-      content="Eco-Red: temperatura, humedad, sensores MQ y UV, enlace LoRa e historial."
+      content="Eco-Red: temperatura, humedad, gas y humo, calidad del aire, monóxido de carbono, radiación UV, enlace LoRa e historial."
     />
     <title>Eco-Red · Panel ambiental</title>
     <link rel="icon" href="/static/logo.svg" type="image/svg+xml" />
@@ -158,29 +158,29 @@
         </article>
         <article class="metric" data-metric="mq2">
           <div class="metric-label">
-            MQ2
+            Gas y humo
             <span class="chip"
               ><svg class="icon" aria-hidden="true">
                 <use href="#i-flame" /></svg
             ></span>
           </div>
           <p class="value"><span id="mq2">—</span><small>ADC</small></p>
-          <p class="metric-note">Gases combustibles y humo</p>
+          <p class="metric-note">Gases inflamables</p>
         </article>
         <article class="metric" data-metric="mq135">
           <div class="metric-label">
-            MQ135
+            Calidad del aire
             <span class="chip"
               ><svg class="icon" aria-hidden="true">
                 <use href="#i-wind" /></svg
             ></span>
           </div>
           <p class="value"><span id="mq135">—</span><small>ADC</small></p>
-          <p class="metric-note">Calidad del aire</p>
+          <p class="metric-note">Contaminantes en el aire</p>
         </article>
         <article class="metric" data-metric="mq9">
           <div class="metric-label">
-            MQ9
+            Monóxido (CO)
             <span class="chip"
               ><svg class="icon" aria-hidden="true">
                 <use href="#i-cloud" /></svg
@@ -191,14 +191,14 @@
         </article>
         <article class="metric" data-metric="uv">
           <div class="metric-label">
-            UV
+            Radiación UV
             <span class="chip"
               ><svg class="icon" aria-hidden="true">
                 <use href="#i-sun" /></svg
             ></span>
           </div>
           <p class="value"><span id="uv">—</span><small>ADC</small></p>
-          <p class="metric-note">Radiación ultravioleta</p>
+          <p class="metric-note">Intensidad del sol</p>
         </article>
       </section>
 
@@ -229,12 +229,12 @@
             ><select id="metric">
               <option value="temperature">Temperatura · °C</option>
               <option value="humidity">Humedad · %</option>
-              <option value="mq2">MQ2 · ADC</option>
-              <option value="mq135">MQ135 · ADC</option>
-              <option value="mq9">MQ9 · ADC</option>
-              <option value="uv">UV · ADC</option>
-              <option value="rssi">RSSI · dBm</option>
-              <option value="snr">SNR · dB</option>
+              <option value="mq2">Gas y humo</option>
+              <option value="mq135">Calidad del aire</option>
+              <option value="mq9">Monóxido de carbono</option>
+              <option value="uv">Radiación UV</option>
+              <option value="rssi">Intensidad de señal LoRa · dBm</option>
+              <option value="snr">Calidad de señal LoRa · dB</option>
             </select>
           </div>
           <div
@@ -272,19 +272,19 @@
               <dd id="humidity-avg">—</dd>
             </div>
             <div data-metric="mq2">
-              <dt>MQ2 medio</dt>
+              <dt>Gas y humo (media)</dt>
               <dd id="mq2-avg">—</dd>
             </div>
             <div data-metric="mq135">
-              <dt>MQ135 medio</dt>
+              <dt>Calidad del aire (media)</dt>
               <dd id="mq135-avg">—</dd>
             </div>
             <div data-metric="mq9">
-              <dt>MQ9 medio</dt>
+              <dt>Monóxido de carbono (media)</dt>
               <dd id="mq9-avg">—</dd>
             </div>
             <div data-metric="uv">
-              <dt>UV máximo</dt>
+              <dt>Radiación UV máxima</dt>
               <dd id="uv-max">—</dd>
             </div>
           </dl>
@@ -316,12 +316,12 @@
                 <th scope="col">Fecha y hora</th>
                 <th scope="col">Temperatura</th>
                 <th scope="col">Humedad</th>
-                <th scope="col">MQ2 · ADC</th>
-                <th scope="col">MQ135 · ADC</th>
-                <th scope="col">MQ9 · ADC</th>
-                <th scope="col">UV · ADC</th>
-                <th scope="col">RSSI</th>
-                <th scope="col">SNR</th>
+                <th scope="col">Gas y humo</th>
+                <th scope="col">Calidad del aire</th>
+                <th scope="col">Monóxido (CO)</th>
+                <th scope="col">Radiación UV</th>
+                <th scope="col">Señal (RSSI)</th>
+                <th scope="col">Calidad señal (SNR)</th>
               </tr>
             </thead>
             <tbody id="history">
