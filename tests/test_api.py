@@ -29,7 +29,13 @@ def settings_override():
 def test_dashboard_and_health():
     assert client.get("/").status_code == 200
     assert "Tu entorno, más cerca." in client.get("/").text
-    for asset in ("/js/app.js", "/js/preferencias.js", "/css/styles.css", "/img/logo.svg", "/fonts/poppins-400.woff2"):
+    for asset in (
+        "/js/app.js",
+        "/js/preferencias.js",
+        "/css/styles.css",
+        "/img/logo.svg",
+        "/fonts/poppins-400.woff2",
+    ):
         assert client.get(asset).status_code == 200, asset
     assert client.get("/health").json() == {"status": "ok"}
     assert (
