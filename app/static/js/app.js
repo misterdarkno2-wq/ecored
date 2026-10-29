@@ -768,6 +768,34 @@ $("text-size").addEventListener("click", () => {
 });
 applyTextSize(document.documentElement.classList.contains("large-text"));
 
+// Modo claro u oscuro: sigue al dispositivo hasta que la persona elige con el botón.
+const darkDevice = window.matchMedia("(prefers-color-scheme: dark)");
+function isDark() {
+  const chosen = document.documentElement.dataset.theme;
+  return chosen ? chosen === "dark" : darkDevice.matches;
+}
+function showThemeButton() {
+  const dark = isDark();
+  $("theme-icon").setAttribute("href", dark ? "#i-sun" : "#i-moon");
+  $("theme-label").textContent = dark ? "Modo claro" : "Modo oscuro";
+}
+$("theme").addEventListener("click", () => {
+  const dark = !isDark();
+  // Si coincide con el dispositivo, se olvida la elección y se vuelve a seguirlo.
+  const followDevice = dark === darkDevice.matches;
+  if (followDevice) delete document.documentElement.dataset.theme;
+  else document.documentElement.dataset.theme = dark ? "dark" : "light";
+  try {
+    if (followDevice) localStorage.removeItem("ecored-tema");
+    else localStorage.setItem("ecored-tema", dark ? "oscuro" : "claro");
+  } catch (e) {
+    // Sin almacenamiento: el cambio dura hasta cerrar la página.
+  }
+  showThemeButton();
+});
+darkDevice.addEventListener("change", showThemeButton);
+showThemeButton();
+
 $("station").addEventListener("change", () => {
   state.station = $("station").value;
   state.offset = 0;

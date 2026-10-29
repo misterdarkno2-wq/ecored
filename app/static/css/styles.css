@@ -67,8 +67,13 @@
   --c-uv: #c98500;
   color-scheme: light;
 }
+/*
+ * Modo oscuro: sigue al dispositivo, salvo que la persona elija otro con el
+ * botón de la barra superior (js/preferencias.js pone data-theme en <html>).
+ * Los dos bloques deben tener los mismos colores.
+ */
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme="light"]) {
     --bg: #0b170b;
     --surface: #132514;
     --surface-soft: #1a301a;
@@ -94,6 +99,32 @@
     --c-uv: #ffc53d;
     color-scheme: dark;
   }
+}
+:root[data-theme="dark"] {
+  --bg: #0b170b;
+  --surface: #132514;
+  --surface-soft: #1a301a;
+  --ink: #f1f8e8;
+  --muted: #c3d3b6;
+  --line: #2c4a28;
+  --brand-ink: var(--lime);
+  --shadow: 0 1px 2px rgb(0 0 0 / 30%), 0 10px 28px -14px rgb(0 0 0 / 60%);
+  --good: #9be36a;
+  --good-bg: #1f3d14;
+  --warn: #ffe08a;
+  --warn-bg: #3d3008;
+  --warn-line: #e8a600;
+  --danger: #ffb4ab;
+  --danger-bg: #4a1513;
+  --none: #b5c2aa;
+  --none-bg: #233122;
+  --c-temperature: #ff9a52;
+  --c-humidity: #4cc3f5;
+  --c-mq2: #ff7b93;
+  --c-mq135: #3fd9a3;
+  --c-mq9: #b394ff;
+  --c-uv: #ffc53d;
+  color-scheme: dark;
 }
 
 html {
@@ -178,7 +209,13 @@ a:focus-visible,
   width: 3rem;
   height: auto;
 }
-.text-size {
+.topbar-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.6rem;
+}
+.top-button {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
@@ -193,8 +230,8 @@ a:focus-visible,
   white-space: nowrap;
   cursor: pointer;
 }
-.text-size[aria-pressed="true"],
-.text-size:hover {
+.top-button[aria-pressed="true"],
+.top-button:hover {
   background: var(--sun);
   color: var(--forest-deep);
 }
@@ -860,7 +897,7 @@ footer {
   .brand img {
     width: 2.4rem;
   }
-  .text-size {
+  .top-button {
     font-size: 0.9rem;
     min-height: 2.75rem;
     padding: 0.35rem 0.8rem;
